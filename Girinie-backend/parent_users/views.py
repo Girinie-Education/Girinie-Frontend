@@ -67,17 +67,9 @@ class UserCreateView(APIView):
     @swagger_auto_schema(
         operation_summary="회원가입",
         operation_description="새로운 사용자 등록. username, password, email 필요.",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['username', 'password', 'email'],
-            properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='사용자 이름'),
-                'password': openapi.Schema(type=openapi.TYPE_STRING, description='비밀번호'),
-                'email': openapi.Schema(type=openapi.TYPE_STRING, description='이메일'),
-            }
-        ),
+        request_body=ParentUserSerializer,
         responses={
-            201: openapi.Response(description='회원가입 성공'),
+            201: ParentUserSerializer,
             400: openapi.Response(description='입력 오류'),
         }
     )
