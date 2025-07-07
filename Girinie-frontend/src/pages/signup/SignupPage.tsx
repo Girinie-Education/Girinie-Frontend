@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { signupUser } from "@/api/auth/signup";
 
 export default function SignupPage() {
   const [id, setId] = useState("");
@@ -14,14 +15,29 @@ export default function SignupPage() {
 
   const email = `${emailLocal}@${isCustomDomain ? customEmailDomain : emailDomain}`;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (password !== passwordConfirm) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
     }
-    // TODO: 회원가입 API 연동
-    console.log("회원가입 시도:", id, password);
+
+    try {
+      const result = await signupUser({
+        username: id,
+        password,
+        email,
+      });
+      console.log("보내는 값", { username: id, password, email });
+
+      console.log("회원가입 성공:", result);
+      alert("회원가입이 완료되었습니다.");
+      navigate("/login");
+    } catch (err: any) {
+      console.error("회원가입 실패:", err.response?.data || err.message || err);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
   };
 
   return (
