@@ -51,12 +51,14 @@ CUSTOM_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework', 'drf_yasg'
+    'rest_framework', 'drf_yasg',
+    'corsheaders',
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -141,5 +143,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'parent_users.ParentUser'
 
 ALLOWED_HOSTS = ['*']  # 개발용으로만 허용 나중에 바꿔야 함
+CORS_ALLOW_ALL_ORIGINS = True # 개발용으로만 허용 나중에 바꿔야 함
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
