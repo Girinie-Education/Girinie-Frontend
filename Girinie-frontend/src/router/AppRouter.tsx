@@ -4,6 +4,7 @@ import Header from "@/components/common/Header";
 import HomePage from "@/pages/home/HomePage.tsx";
 import LoginPage from "@/pages/login/LoginPage";
 import SignupPage from "@/pages/signup/SignupPage";
+import FindAccountPage from "@/pages/account/FindAccountPage";
 import GuardianPage from "@/pages/gardian/GuardianPage";
 import ChildPage from "@/pages/child/ChildPage";
 import SettingsPage from "@/pages/settings/SettingPage";
@@ -21,6 +22,7 @@ export default function AppRouter() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/find-account" element={<FindAccountPage />} />
         <Route path="/gardian" element={<GuardianPage />} />
         <Route path="/child" element={<ChildPage />} />
         <Route path="/report" element={<ReportPage />} />
