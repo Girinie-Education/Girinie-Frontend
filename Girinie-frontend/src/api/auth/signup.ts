@@ -8,6 +8,6 @@ interface SignupPayload {
 }
 
 export const signupUser = async (payload: SignupPayload) => {
-  const res = await axios.put("/parent_users/users/", payload);
+  const res = await axios.put("/parent_users/", payload);
   return res.data;
 };
