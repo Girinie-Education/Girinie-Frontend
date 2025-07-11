@@ -1,35 +1,27 @@
 import React, { useState } from "react";
-import { childList, Child } from "@/lib/childData";
+import { useChildData } from "@/hooks/useChildData";
 
 interface ChildListProps {
     className?: string;
 }
-
 const ChildList: React.FC<ChildListProps> = ({ className }) => {
-    const [selected, setSelected] = useState<string>(childList[0]?.id || '');
+  const { data: children, loading, error } = useChildData();
+  const [selected, setSelected] = useState(children[0]?.id ?? '');
 
-    return (
-        <div className="px-4">
-          <ul className="space-y-4">
-            {childList.map((child: Child) => (
-              <li
-                key={child.id}
-                className={`px-4 flex items-center space-x-4 hover:text-tertiary cursor-pointer ${
-                  selected === child.id ? 'font-semibold text-black' : 'text-gray-400'
-                }`}
-                onClick={() => setSelected(child.id)}
-              >
-                <img
-                  src={child.avatarUrl ?? '/img/default-avatar.png'}
-                  alt={child.name}
-                  className="h-10 w-10 rounded-full bg-gray-200"
-                />
-                <span className="text-lg font-semibold">{child.name}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    };
-    
-    export default ChildList;
+  if (loading) return <div>로딩 중…</div>;
+  if (error)   return <div className="text-red-500">{error}</div>;
+
+  return (
+    <ul className={className}>
+      {children.map(child => (
+        <li
+          key={child.id}
+          onClick={() => setSelected(child.id)}
+          className={selected === child.id ? "…" : "…"}
+        >
+          {/* 생략 */}
+        </li>
+      ))}
+    </ul>
+  );
+};

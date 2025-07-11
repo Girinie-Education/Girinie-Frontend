@@ -12,7 +12,8 @@
         "@router/*": ["src/router/*"],
         "@stores/*": ["src/stores/*"],
         "@types/*": ["src/types/*"],
-        "@utils/*": ["src/utils/*"]
+        "@utils/*": ["src/utils/*"],
+        "@api/*": ["src/api/*"]
       },
       "composite": true,
       "incremental": true,
@@ -38,6 +39,7 @@
       "noFallthroughCasesInSwitch": true,
     //   "noUncheckedSideEffectImports": true
     },
-    "include": ["src"]
+    "include": ["src/**/*", "src/svg.d.ts"],
+    "exclude": ["node_modules", "dist"]
   }
   

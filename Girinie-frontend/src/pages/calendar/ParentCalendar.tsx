@@ -1,15 +1,15 @@
+// import React from "react";
 import Calendar from "@/components/calendar/Calendar";
+import GuardianSidebar from "@/components/common/GuardianSidebar";
 
 export default function ParentCalendarPage() {
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-white">
       <div className="flex">
-        {/* Sidebar placeholder */}
-        <aside className="mr-6 hidden lg:block lg:w-64">{/* Sidebar will be added here */}</aside>
+\        <aside className="mr-6 hidden lg:block lg:w-64">{ <GuardianSidebar/> }</aside>
 
-        {/* Main content */}
         <main className="flex min-h-screen flex-1 items-center justify-center">
-          <div className="w-full max-w-4xl">
+          <div className="mt-10 w-full max-w-4xl">
             <Calendar mode="child" />
           </div>
         </main>
