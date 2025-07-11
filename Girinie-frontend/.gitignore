@@ -1,6 +1,14 @@
-node_modules/
 # dependencies
 node_modules/
 
 # vite cache / build
 .vite/
+
+# build output
+dist/
+
+# environment files
+.env
+
+# macOS 파일
+.DS_Store
