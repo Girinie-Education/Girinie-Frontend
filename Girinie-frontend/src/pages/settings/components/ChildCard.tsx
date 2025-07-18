@@ -1,5 +1,6 @@
 import React from "react";
 import { ChildUser } from "@/lib/childData";  
+import GirinieIcon from '@/assets/icons/Girinie.svg';
 
 interface ChildCardProps {
   child: ChildUser;
@@ -9,7 +10,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-[300px] sm:max-w-[340px] md:max-w-[360px] h-[350px] flex flex-col items-center flex-shrink-0">
       <img
-        src={child.avatarUrl ?? "/img/default-avatar.png"}
+        src={child.avatarUrl ?? GirinieIcon}
         alt={child.name}
         className="w-24 h-24 rounded-full bg-gray-200 mb-7 mt-2"
       />
