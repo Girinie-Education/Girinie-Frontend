@@ -33,6 +33,13 @@ export default {
         'on-error': '#FFFFFF',
         'error-container': '#FDECEA',
         'on-error-container': '#D8433B',
+
+        childLevel: {
+          gold: '#FFE76A',
+          silver: '#D7E2E4',
+          bronze: '#E0AB5B',
+        },
+      
       },
       spacing: {
         '15': '3.75rem',

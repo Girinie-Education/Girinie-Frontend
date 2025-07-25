@@ -1,4 +1,5 @@
-import axios from "@/lib/axios";
+// src/api/auth/login.ts
+import { apiClient } from "@/api/common";
 
 interface LoginPayload {
   username: string;
@@ -6,8 +7,6 @@ interface LoginPayload {
 }
 
 export const loginUser = async (payload: LoginPayload) => {
-  const res = await axios.post("/parent_users/login/", payload, {
-    withCredentials: true, // 세션 기반 인증일 경우 필요
-  });
+  const res = await apiClient.post("/parent_users/login/", payload);
   return res.data;
 };
