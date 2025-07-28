@@ -19,9 +19,9 @@ export default function ChatBotPage() {
 
   const COLOR_MAP: Record<string, string> = {
     white: "bg-white",
-    bronze: "bg-amber-200",
-    silver: "bg-gray-200",
-    gold: "bg-yellow-300",
+    bronze: "bg-childLevel-bronze",
+    silver: "bg-childLevel-silver",
+    gold: "bg-childLevel-gold",
   };
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -39,7 +39,6 @@ export default function ChatBotPage() {
     "존중": child?.kindness_level ?? 0,
   };
 
-  // 초기 메시지
   useEffect(() => {
     const welcome: Message = {
       id: Date.now(),
@@ -49,11 +48,8 @@ export default function ChatBotPage() {
     setMessages([welcome]);
   }, []);
 
-  // 자동 스크롤
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const addMessage = (text: string, sender: "user" | "bot") => {
@@ -71,7 +67,6 @@ export default function ChatBotPage() {
     addMessage(input.trim(), "user");
     setInput("");
 
-    // 임시 응답
     setTimeout(() => {
       addMessage("죄송해요, 아직 준비 중입니다. 나중에 다시 시도해주세요.", "bot");
     }, 800);
@@ -88,14 +83,14 @@ export default function ChatBotPage() {
   return (
     <div className="flex min-h-screen bg-primary">
       <ChildSidebar />
-      <div className="ml-60 flex-1 flex flex-col p-6">
 
-        {/* 메시지 리스트 */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 mb-4 scrollbar-hide">
+      <div className="mt-25 ml-60 flex flex-col flex-1 relative">
+        {/* 메시지 영역 */}
+        <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24 scroll-smooth">
           {messages.map((msg, idx) => {
             const isFirstBot = idx === 0 && msg.sender === "bot";
             const justifyClass = msg.sender === "user" ? "justify-end" : "justify-start";
-            const baseClass = "inline-flex flex-col p-4 rounded-lg shadow break-words whitespace-pre-wrap items-start bg-white";
+            const baseClass = "inline-flex flex-col p-4 bg-white/90 rounded-lg shadow break-words whitespace-pre-wrap items-start";
             const colorClass = msg.sender === "user"
               ? "bg-white text-gray-800"
               : isFirstBot
@@ -103,15 +98,20 @@ export default function ChatBotPage() {
                 : "bg-white/80 text-gray-900";
 
             return (
-              <div key={msg.id} className={`flex ${justifyClass}`}>
-                <div className="mt-25 flex gap-2 items-start">
-                  {isFirstBot && (
+              <div key={msg.id} className={`flex ${justifyClass} mb-2`}>
+                <div className="mt-2 flex gap-2 items-start">
+                  {msg.sender === "bot" && (
                     <img src={giraffeIcon} alt="기린" className="w-10 h-10 mt-1" />
                   )}
                   <div className={`${baseClass} ${colorClass}`}>
-                    <span className="p-1 mb-3 text-left w-full">{msg.text.trim()}</span>
                     {isFirstBot && (
-                      <div className="grid grid-cols-4 gap-2">
+                      <span className="p-1 mb-3 text-left w-full">{msg.text.trim()}</span>
+                    )}
+                    {!isFirstBot && (
+                      <span className="text-left w-full">{msg.text.trim()}</span>
+                    )}
+                    {isFirstBot && (
+                      <div className="grid grid-cols-4 gap-2 mt-3">
                         {Object.entries(levelMap).map(([label, level]) => (
                           <LevelButton key={label} label={label} level={level} onClick={handleLevelClick} />
                         ))}
@@ -122,19 +122,26 @@ export default function ChatBotPage() {
               </div>
             );
           })}
+          <div ref={scrollRef} />
         </div>
 
-        {/* 입력창 */}
-        <form onSubmit={handleSend} className="flex items-center gap-2">
+        {/* 입력창: 고정 위치 */}
+        <form
+          onSubmit={handleSend}
+          className="w-full px-6 py-4 bg-primary border-t flex items-center gap-2 sticky bottom-0"
+        >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="메시지 입력"
-            className="flex-1 p-3 rounded-lg border focus:ring-2 focus:ring-primary"
+            className="flex-1 p-3 rounded-lg border focus:outline-none"
           />
-          <button type="submit" className="p-3 rounded-lg bg-white hover:bg-gray-300 transition">
-            <Send size={20} className="text-primary" />
+          <button
+            type="submit"
+            className="p-3 rounded-lg bg-white hover:bg-gray-100 transition"
+          >
+            <Send size={20} className="text-gray-400" />
           </button>
         </form>
       </div>

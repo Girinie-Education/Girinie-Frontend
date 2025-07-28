@@ -19,7 +19,7 @@ export default function LevelButton({ label, level, onClick }: LevelButtonProps)
   return (
     <button
       className={classNames(
-        "px-4 py-2 rounded border shadow text-black font-semibold transition",
+        "px-4 py-2 rounded border shadow text-black font-semibold transition hover:border-thirdary",
         getColorClass(level)
       )}
       onClick={() => onClick(label)}

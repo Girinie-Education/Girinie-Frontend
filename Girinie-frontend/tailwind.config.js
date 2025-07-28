@@ -10,29 +10,15 @@ export default {
         SUIT: ['SUIT', 'sans-serif'],
       },
       colors: {
-        /** Primary Colors **/
         primary: '#FEF1B0',
-        'on-primary': '#FFFFFF',
-        'primary-container': '#E8F0FF',
-        'on-primary-container': '#3D5AFE',
 
-        /** Secondary Colors **/
         secondary: '#FFE76A',
-        'on-secondary': '#FFFFFF',
-        'secondary-container': '#DDE7FF',
-        'on-secondary-container': '#2C3A87',
 
-        /** Tertiary Colors **/
+        thirdary: `#6E4C41`,
+
         tertiary: '#E0AB5B',
-        'on-tertiary': '#FFFFFF',
-        'tertiary-container': '#FBE47A',
-        'on-tertiary-container': '#141414',
 
-        /** Error Colors **/
         error: '#D8433B',
-        'on-error': '#FFFFFF',
-        'error-container': '#FDECEA',
-        'on-error-container': '#D8433B',
 
         childLevel: {
           gold: '#FFE76A',
