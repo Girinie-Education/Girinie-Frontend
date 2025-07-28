@@ -13,7 +13,7 @@ const GuardianSidebar: React.FC = () => {
 
   if (!isLoggedIn) return null;
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname.startsWith(path);
 
   if (loading) {
     return (

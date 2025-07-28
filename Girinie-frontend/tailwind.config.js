@@ -10,13 +10,13 @@ export default {
         SUIT: ['SUIT', 'sans-serif'],
       },
       colors: {
-        primary: '#FEF1B0',
+        primary: '#FEF1B0',   // 연한 크림
+        yellowBase: '#FCCF5B', // 중간 노랑
+        secondary: '#FFE76A', // 진한 노랑
+        tertiary: '#E0AB5B',   // 약간의 주황기
+        thirdary: '#6E4C41',   // 브라운 계열
 
-        secondary: '#FFE76A',
-
-        thirdary: `#6E4C41`,
-
-        tertiary: '#E0AB5B',
+        
 
         error: '#D8433B',
 

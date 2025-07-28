@@ -34,7 +34,7 @@ const Header = () => {
           </nav>
 
           <Button
-            className="h-9 px-4 sm:px-5 text-white bg-[#CE995D] hover:bg-[#F9E0AE] transition-colors"
+            className="h-9 px-4 sm:px-5 text-white bg-tertiary hover:bg-[#F9E0AE] transition-colors"
             onClick={() => navigate("/login")}
           >
             로그인 →

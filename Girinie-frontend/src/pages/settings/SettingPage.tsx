@@ -42,8 +42,7 @@ export default function SettingPage() {
           <GuardianSidebar />
         </aside>
 
-        {/* 메인: 오직 이 부분만 스크롤 */}
-        <main className="mt-20 flex flex-1 items-start justify-center p-10 max-w-7xl mx-auto overflow-y-auto">
+        <main className="mt-25 flex flex-1 items-start justify-center p-10 max-w-7xl mx-auto overflow-y-auto">
           <div className="w-full">
             <h3 className="text-xl font-semibold mb-4">아이 설정</h3>
 
@@ -102,7 +101,7 @@ export default function SettingPage() {
             </div>
 
             {/* 계정 설정 */}
-            <div className="mt-10 space-y-2 text-gray-800">
+            <div className="mt-15 space-y-2 text-gray-800">
               <div className="text-xl font-semibold mb-4">계정 설정</div>
               <div className="cursor-pointer hover:underline">로그아웃</div>
               <div className="text-red-500 cursor-pointer hover:underline">
