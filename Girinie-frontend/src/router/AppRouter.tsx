@@ -13,8 +13,7 @@ import SettingsPage from "@/pages/settings/SettingPage";
 import ReportPage from "@/pages/report/ReportPage";
 import ChatbotPage from "@/pages/chatbot/ChatBotPage";
 import LearningRagePage from "@/pages/learningrate/LearningRatePage";
-import CalendarRouterPage from "@/pages/CalendarPage/CalendarRouter";
-import ParentCalendarPage from "@/pages/calendar/ParentCalendar";
+import CalendarRouterPage from "@/pages/calendar/CalendarRouter";
 
 export default function AppRouter() {
   return (
@@ -86,14 +85,6 @@ export default function AppRouter() {
           element={
             <ProtectedRoute>
               <CalendarRouterPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/parentCalendar"
-          element={
-            <ProtectedRoute>
-              <ParentCalendarPage />
             </ProtectedRoute>
           }
         />

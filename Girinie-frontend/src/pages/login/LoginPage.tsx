@@ -11,13 +11,40 @@ export default function LoginPage() {
     e.preventDefault();
     console.log("로그인 시도:", id, password);
     try {
-      const res = await loginUser({ username: id, password });
-      console.log("로그인 성공", res);
+      const res = await loginUser({ username: id.trim(), password });
+      // Robust response log
+      console.log("[login] success response:", {
+        status: (res && res.status) || "n/a",
+        data: (res && res.data) || res,
+      });
+      // Extract token from common shapes
+      const data = (res && res.data) || res || {};
+      const access = data.access || data.token || (res && res.access) || (res && res.token);
+      if (access) {
+        try {
+          window.localStorage.setItem("accessToken", access);
+          console.log("[login] accessToken saved to localStorage");
+        } catch (e) {
+          console.warn("[login] failed to store accessToken in localStorage", e);
+        }
+      } else {
+        console.warn("[login] no access token found in response");
+      }
       alert("로그인 성공!");
-      navigate("/");
+      console.log("[login] success");
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || "/calendar/parent";
+      navigate(next);
     } catch (err: any) {
-      console.error("로그인 실패:", err.response?.data || err.message);
-      alert("로그인 실패: " + (err.response?.status === 401 ? "인증 실패" : "오류 발생"));
+      console.error("[login] failed:", {
+        status: err?.response?.status,
+        data: err?.response?.data ?? err?.message ?? err,
+      });
+      const msg =
+        err?.response?.status === 401
+          ? "인증 실패"
+          : err?.response?.data?.detail || err?.response?.data?.message || "오류 발생";
+      alert("로그인 실패: " + msg);
     }
   };
 

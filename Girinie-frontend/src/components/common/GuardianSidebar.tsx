@@ -7,16 +7,16 @@ import { useChildData } from "@/hooks/useChildData";
 
 const GuardianSidebar: React.FC = () => {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const { data: children, loading, error } = useChildData();
   const location = useLocation();
   const navigate = useNavigate();
+  const { data: childList, loading, error } = useChildData();
   const [selectedChildId, setSelectedChildId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (Array.isArray(children) && children.length > 0) {
-      setSelectedChildId(String(children[0].id));
+    if (Array.isArray(childList) && childList.length > 0) {
+      setSelectedChildId(String(childList[0].id));
     }
-  }, [children]);
+  }, [childList]);
 
   if (!isLoggedIn) return null;
 
@@ -38,10 +38,10 @@ const GuardianSidebar: React.FC = () => {
     );
   }
 
-  if (!Array.isArray(children) || children.length === 0) {
+  if (!Array.isArray(childList) || childList.length === 0) {
     return (
       <aside className="fixed left-0 top-0 h-screen w-56 border-r border-gray-300 bg-white p-6 pt-20 text-gray-500">
-        {Array.isArray(children) ? "등록된 자녀가 없습니다." : "자녀 목록을 가져올 수 없습니다."}
+        {Array.isArray(childList) ? "등록된 자녀가 없습니다." : "자녀 목록을 가져올 수 없습니다."}
       </aside>
     );
   }
@@ -50,7 +50,7 @@ const GuardianSidebar: React.FC = () => {
     <aside className="sticky left-0 top-0 flex h-full w-56 flex-col justify-between border-r border-gray-300 bg-white pt-20 text-black">
       <div className="flex-1 overflow-y-auto p-7">
         <ul className="space-y-4">
-          {children.map((child) => (
+          {childList.map((child) => (
             <li
               key={child.id}
               onClick={() => navigate(`/child/${child.id}`)}

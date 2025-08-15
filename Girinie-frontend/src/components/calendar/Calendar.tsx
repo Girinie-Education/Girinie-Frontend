@@ -14,6 +14,7 @@ const days = ["일", "월", "화", "수", "목", "금", "토"];
 
 const Calendar: React.FC<CalendarProps> = ({ mode, onDayClick, renderStamp, highlightToday }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const today = new Date();
 
   const handlePrevMonth = () => {
     setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -69,13 +70,18 @@ const Calendar: React.FC<CalendarProps> = ({ mode, onDayClick, renderStamp, high
             ...Array.from({ length: daysInMonth }, (_, i) => {
               const date = new Date(year, month, i + 1);
               const isSunday = (i + startDay) % 7 === 0;
-              const isTodayHighlighted = highlightToday?.(date);
+              const isToday =
+                date.getFullYear() === today.getFullYear() &&
+                date.getMonth() === today.getMonth() &&
+                date.getDate() === today.getDate();
+              const isTodayHighlighted =
+                typeof highlightToday === "function" ? !!highlightToday(date) : isToday;
 
               return (
                 <div
                   key={i}
                   className={`relative aspect-square cursor-pointer border-b border-r border-gray-300 p-2 text-left ${
-                    isTodayHighlighted ? "bg-yellow-100" : ""
+                    isTodayHighlighted ? "bg-[#FFE76A]" : ""
                   }`}
                   onClick={() => onDayClick?.(date)}
                 >

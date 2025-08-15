@@ -1,5 +1,5 @@
 // src/api/auth/login.ts
-import { apiClient } from "@/api/common";
+import { apiClient, ensureCsrfCookie } from "@/api/common";
 
 interface LoginPayload {
   username: string;
@@ -7,6 +7,11 @@ interface LoginPayload {
 }
 
 export const loginUser = async (payload: LoginPayload) => {
-  const res = await apiClient.post("/parent_users/login/", payload);
-  return res.data;
+  await ensureCsrfCookie();
+  const body = {
+    username: payload.username?.trim(),
+    password: payload.password, // 비밀번호는 트림하지 않음
+  };
+  const res = await apiClient.post("/parent_users/login/", body);
+  return res.data ?? res;
 };
