@@ -1,5 +1,6 @@
 import React from "react";
 import { ChildUser } from "@/lib/childData";  
+import { useNavigate } from "react-router-dom";
 import GirinieIcon from '@/assets/icons/Girinie.svg';
 
 interface ChildCardProps {
@@ -7,6 +8,7 @@ interface ChildCardProps {
 }
 
 const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-[300px] sm:max-w-[340px] md:max-w-[360px] h-[350px] flex flex-col items-center flex-shrink-0">
       <img
@@ -24,9 +26,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
         <hr className="border-gray-300" />
       </div>
       <button
-        onClick={() => {
-          /* 수정 페이지로 이동하려면 navigate 호출 */
-        }}
+        onClick={() => navigate(`/settings/child/${child.id}/edit`)}
         className="mt-6 bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded"
       >
         정보 수정
