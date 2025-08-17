@@ -8,13 +8,13 @@ import IconParent from "@/assets/images/G3.svg?react";
 export default function HomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
-      <main className="flex flex-col items-center gap-0 py-20 pt-[88px] text-left">
-        <section className="m-0 grid w-full grid-cols-1 gap-8 border-none bg-[#FEF1B0] px-4 py-28 md:grid-cols-3 md:px-8 lg:px-16">
+      <main className="flex flex-col items-center gap-0 text-left">
+        <section className="m-0 grid w-full grid-cols-1 gap-8 border-none bg-[#FEF1B0] px-4 py-52 md:grid-cols-2 md:px-8 lg:px-16">
           <div className="col-span-1 flex items-center justify-center">
-            <Logo className="h-auto w-[500px] md:w-[700px] lg:w-[900px]" />
+            <Logo style={{ width: "1000px", height: "auto" }} />
           </div>
-          <div className="col-span-2 mt-0 space-y-4 px-4">
-            <h2 className="text-4xl font-bold text-[#333]">
+          <div className="col-span-1 mt-0 space-y-4 px-4">
+            <h2 className="pb-8 pt-8 text-4xl font-bold text-[#333]">
               다문화 가정 아동을 위한 스마트 러닝 파트너
             </h2>
             <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
@@ -25,8 +25,10 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="w-full border-none bg-[#FFF3D5] px-4 py-28 md:px-8 lg:px-16">
-          <h2 className="mb-12 text-center text-3xl font-bold text-[#333]">왜 기리니인가요?</h2>
+        <section className="w-full border-none bg-[#FFF3D5] px-4 py-52 md:px-8 lg:px-16">
+          <h2 className="mb-28 mt-[-40px] text-center text-4xl font-bold text-[#333]">
+            왜 기리니인가요?
+          </h2>
           <div className="grid w-full grid-cols-1 gap-8 text-center md:grid-cols-3">
             {/* Card 1 */}
             <div className="flex h-[280px] flex-col justify-center rounded-lg bg-white p-8 shadow-md transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg">
@@ -54,7 +56,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="w-full border-none bg-[#F5F5F5] px-4 py-28 md:px-8 lg:px-16">
+        <section className="w-full border-none bg-[#F5F5F5] px-4 py-52 md:px-8 lg:px-16">
           <div className="grid w-full grid-cols-1 items-center gap-8 md:grid-cols-2">
             {/* 왼쪽 텍스트 */}
             <div className="text-left">
@@ -78,17 +80,15 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section className="w-full border-none bg-[#FEF1B0] px-4 py-24 text-center md:px-8 lg:px-16">
+        <section className="w-full border-none bg-[#FEF1B0] px-4 py-52 text-center md:px-8 lg:px-16">
           <div className="w-full">
-            <h2 className="mb-4 text-2xl font-bold text-[#333]">
-              언어와 문화를 넘어, 아이의 미래까지
-            </h2>
-            <p className="mb-6 text-gray-600">
-              기초 학습부터 생활 어휘까지, AI 챗봇이 함께하는 스마트 러닝.
+            <h2 className="mb-8 text-2xl font-bold text-[#333]">기리니와 함께 학습해볼까요?</h2>
+            <p className="mb-12 text-gray-600">
+              기초 학습부터 생활 어휘까지, 공백없는 탄탄한 학습 챗봇. 기리니를 시작해보세요.
             </p>
             <a
               href="/signup"
-              className="inline-block rounded bg-[#C1905C] px-6 py-3 font-semibold text-white hover:bg-[#a87847]"
+              className="inline-block rounded bg-[#C1905C] px-12 py-6 text-2xl font-bold text-white hover:bg-[#a87847]"
             >
               지금 시작하기
             </a>

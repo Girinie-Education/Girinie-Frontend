@@ -13,11 +13,29 @@ export default defineConfig({
     },
   },
   server: {
+    port: 5173,
+    host: true,
     proxy: {
       "/api/v1": {
-        target: 'https://cfdb3206bd92.ngrok-free.app',
+        target: "https://e6da10b0b3fc.ngrok-free.app",
         changeOrigin: true,
-        secure: false,
+        secure: true,
+        // keep path as-is (/api/v1/...)
+        // rewrite: (p) => p,
+        configure: (proxy) => {
+          proxy.on("proxyRes", (proxyRes) => {
+            const setCookie = proxyRes.headers["set-cookie"];
+            if (Array.isArray(setCookie)) {
+              proxyRes.headers["set-cookie"] = setCookie.map((cookie) =>
+                cookie
+                  // force cookie for localhost so the browser stores it on dev origin
+                  .replace(/;\s*Domain=[^;]+/i, "; Domain=localhost")
+                  // allow http dev server to store cookies
+                  .replace(/;\s*Secure/gi, "")
+              );
+            }
+          });
+        },
       },
     },
   },
