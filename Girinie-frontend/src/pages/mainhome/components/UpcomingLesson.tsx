@@ -2,15 +2,16 @@ import React from "react";
 import Card from "./Card";
 import Girinie from "@/assets/icons/Girinieprofile.svg";
 
-const UpcomingLesson: React.FC = () => (
-  <Card title="회화 표현 학습하기">
+type Props = { conversation: string | undefined; isBlurred?: boolean };
+
+const UpcomingLesson: React.FC<Props> = ({ conversation, isBlurred = false }) => (
+  <Card title="회화 표현 학습하기" className={isBlurred ? "blur-sm" : ""}>
     <div className="mt-3 relative p-4 md:p-6">
-      {/* 텍스트: 왼쪽 정렬 */}
       <p className="text-thirdary font-body1-m text-lg md:text-xl">
-        금요일에 시간 있어?
+        {isBlurred ? "데이터 없음" : conversation}
       </p>
 
-      {/* 버튼: 가운데 정렬 */}
+      {/* 버튼과 이미지는 블러 상태에서도 표시 */}
       <button
         type="button"
         className="mt-6 mx-auto block rounded-full px-5 md:px-6 py-2 md:py-2.5
@@ -37,7 +38,6 @@ const UpcomingLesson: React.FC = () => (
         </span>
       </button>
 
-      {/* 기린: 오른쪽 하단 고정, 더 크게 */}
       <img
         src={Girinie}
         alt=""
