@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logoUrl from "@/assets/icons/TextLogo.svg";
@@ -6,21 +5,16 @@ import { useAuthStore } from "@/stores/authStore";
 
 const Header = () => {
   const navigate = useNavigate();
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-  const logout = useAuthStore((s) => s.logout);
+  const isLoggedIn = useAuthStore(state => state.isLoggedIn);
 
   const handleLogoClick = () => {
-    if (isLoggedIn) {
-      navigate("/home");
-    } else {
-      navigate("/");
-    }
+    navigate(isLoggedIn ? "/home" : "/");
   };
 
-  const handleLogoutClick = useCallback(() => {
-    logout();
-    navigate("/");
-  }, [logout, navigate]);
+  const handleLogoutClick = () => {
+    useAuthStore.getState().logout();
+    navigate("/", { replace: true });
+  };
 
   return (
     <header className="fixed left-0 top-0 z-50 w-full border-b border-gray-200 bg-white py-3">

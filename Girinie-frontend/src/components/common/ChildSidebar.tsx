@@ -5,7 +5,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useChildData } from "@/hooks/useChildData";
 
 const ChildSidebar: React.FC = () => {
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const isLoggedIn = useAuthStore(state => state.isLoggedIn);
   const location = useLocation();
   const navigate = useNavigate();
   const { data: children, loading, error } = useChildData();
@@ -69,7 +69,7 @@ const ChildSidebar: React.FC = () => {
           <div
             onClick={() => navigate("/chatbot")}
             className={`cursor-pointer px-8 py-4 transition hover:text-secondary ${
-              isActive("/parentCalendar") ? "font-semibold text-black" : "text-gray-500"
+              isActive("/chatbot") ? "font-semibold text-black" : "text-gray-500"
             }`}
           >
             챗봇
@@ -78,16 +78,16 @@ const ChildSidebar: React.FC = () => {
           <div
             onClick={() => navigate("/learningrate")}
             className={`cursor-pointer px-8 py-4 transition hover:text-secondary ${
-              isActive("/settings") ? "font-semibold text-black" : "text-gray-500"
+              isActive("/learningrate") ? "font-semibold text-black" : "text-gray-500"
             }`}
           >
             학습률
           </div>
           <hr className="my-1 border-gray-200" />
           <div
-            onClick={() => navigate("/chileCalendar")}
+            onClick={() => navigate("/calendar/child")}
             className={`cursor-pointer px-8 py-4 transition hover:text-secondary ${
-              isActive("/settings") ? "font-semibold text-black" : "text-gray-500"
+              isActive("/calendar/child") ? "font-semibold text-black" : "text-gray-500"
             }`}
           >
             캘린더
