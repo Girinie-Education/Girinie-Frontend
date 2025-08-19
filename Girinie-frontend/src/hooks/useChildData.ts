@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { fetchChildUsers, ChildUser } from "@/lib/childData";
 
 export const useChildData = () => {
-  const [data,    setData]    = useState<ChildUser[]>([]);
+  const [data, setData] = useState<ChildUser[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);

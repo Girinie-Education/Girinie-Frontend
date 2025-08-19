@@ -5,12 +5,16 @@ import RightButtonImg from "@/assets/calendar/RightButton.png";
 
 type CalendarProps = {
   mode: "parent" | "child";
+  onDayClick?: (date: Date) => void;
+  renderStamp?: (date: Date) => React.ReactNode;
+  highlightToday?: (date: Date) => boolean;
 };
 
 const days = ["일", "월", "화", "수", "목", "금", "토"];
 
-const Calendar: React.FC<CalendarProps> = ({ mode }) => {
+const Calendar: React.FC<CalendarProps> = ({ mode, onDayClick, renderStamp, highlightToday }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const today = new Date();
 
   const handlePrevMonth = () => {
     setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -35,7 +39,7 @@ const Calendar: React.FC<CalendarProps> = ({ mode }) => {
   const startDay = getFirstDayOfMonth(year, month);
 
   return (
-    <main className="flex-1 flex justify-center p-6">
+    <main className="flex flex-1 justify-center p-6">
       <div className="aspect-[4/3] w-full max-w-3xl rounded-3xl bg-white p-6 shadow-2xl">
         <div className="mb-4 flex items-center justify-between px-4 md:px-2">
           <h1 className="text-xl font-semibold">
@@ -63,30 +67,31 @@ const Calendar: React.FC<CalendarProps> = ({ mode }) => {
             ...Array.from({ length: startDay }).map((_, i) => (
               <div key={`empty-${i}`} className="aspect-square border-b border-r border-gray-300" />
             )),
-            ...Array.from({ length: daysInMonth }, (_, i) => (
-              <div
-                key={i}
-                className="relative aspect-square border-b border-r border-gray-300 p-2 text-left"
-              >
+            ...Array.from({ length: daysInMonth }, (_, i) => {
+              const date = new Date(year, month, i + 1);
+              const isSunday = (i + startDay) % 7 === 0;
+              const isToday =
+                date.getFullYear() === today.getFullYear() &&
+                date.getMonth() === today.getMonth() &&
+                date.getDate() === today.getDate();
+              const isTodayHighlighted =
+                typeof highlightToday === "function" ? !!highlightToday(date) : isToday;
+
+              return (
                 <div
-                  className={`text-lg font-semibold ${(i + startDay) % 7 === 0 ? "text-[#FF6464]" : ""}`}
+                  key={i}
+                  className={`relative aspect-square cursor-pointer border-b border-r border-gray-300 p-2 text-left ${
+                    isTodayHighlighted ? "bg-[#FFE76A]" : ""
+                  }`}
+                  onClick={() => onDayClick?.(date)}
                 >
-                  {i + 1}
+                  <div className={`text-lg font-semibold ${isSunday ? "text-[#FF6464]" : ""}`}>
+                    {i + 1}
+                  </div>
+                  <div className="text-center">{renderStamp?.(date)}</div>
                 </div>
-                <div className="text-center">
-                  {mode === "child" ? (
-                    <img
-                      src={giraffeImg}
-                      alt="giraffe"
-                      className="absolute bottom-0 right-1 h-16 w-16"
-                      //h-12 w-12 작은 버전
-                    />
-                  ) : (
-                    "📊"
-                  )}
-                </div>
-              </div>
-            )),
+              );
+            }),
           ]}
         </div>
       </div>

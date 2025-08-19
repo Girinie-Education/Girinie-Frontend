@@ -149,8 +149,11 @@ export default function ChatBotPage() {
           <div ref={scrollRef} />
         </div>
 
-        {/* 입력창 */}
-        <form onSubmit={handleSend} className="w-full px-6 py-4 bg-primary border-t flex items-center gap-2 sticky bottom-0">
+        {/* 입력창: 고정 위치 */}
+        <form
+          onSubmit={handleSend}
+          className="w-full px-15 py-8 bg-primary border-t flex items-center gap-2 sticky bottom-0"
+        >
           <input
             type="text"
             value={input}
