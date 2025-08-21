@@ -1,11 +1,17 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logoUrl from "@/assets/icons/TextLogo.svg";
 import { useAuthStore } from "@/stores/authStore";
+import { useChildData } from "@/hooks/useChildData";
 
 const Header = () => {
   const navigate = useNavigate();
   const isLoggedIn = useAuthStore(state => state.isLoggedIn);
+  const { childId: urlChildId } = useParams(); // ★★★ URL에서 childId 가져오기 ★★★
+  const { data: children } = useChildData();
+
+  // ★★★ 현재 자녀 ID를 결정합니다. URL에 있으면 그걸 사용하고, 없으면 첫 번째 자녀의 ID를 사용합니다. ★★★
+  const currentChildId = urlChildId || (children && children.length > 0 ? children[0].id.toString() : null);
 
   const handleLogoClick = () => {
     navigate(isLoggedIn ? "/home" : "/");
@@ -14,6 +20,16 @@ const Header = () => {
   const handleLogoutClick = () => {
     useAuthStore.getState().logout();
     navigate("/", { replace: true });
+  };
+  
+  // ★★★ '아이' 버튼의 onClick 핸들러를 수정합니다. ★★★
+  const handleChildChatClick = () => {
+    if (currentChildId) {
+      navigate(`/chatbot/${currentChildId}`);
+    } else {
+      // 자녀 데이터가 없는 경우, 다른 페이지로 이동하거나 알림 표시
+      alert("등록된 자녀가 없습니다.");
+    }
   };
 
   return (
@@ -37,7 +53,7 @@ const Header = () => {
               보호자
             </button>
             <button
-              onClick={() => navigate("/chatbot")}
+              onClick={handleChildChatClick} // ★★★ 수정된 핸들러 사용 ★★★
               className="transition-colors hover:text-[#FF6464]"
             >
               아이

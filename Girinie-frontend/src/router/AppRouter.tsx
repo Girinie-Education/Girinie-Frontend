@@ -11,7 +11,6 @@ import FindAccountPage from "@/pages/account/FindAccountPage";
 
 // 로그인 후 페이지 (공통)
 import MainHomePage from "@/pages/mainhome/HomePage";
-// import GuardianPage from "@/pages/gardian/GuardianPage";
 import ChildPage from "@/pages/child/ChildPage";
 import SettingsPage from "@/pages/settings/SettingPage";
 import ReportPage from "@/pages/report/ReportPage";
@@ -23,14 +22,12 @@ import LearningRatePage from "@/pages/learningrate/LearningRatePage";
 import CalendarRouterPage from "@/pages/calendar/CalendarRouter";
 import ParentCalendarPage from "@/pages/calendar/ParentCalendar";
 
-/** 비로그인 전용 라우트: 로그인 상태면 /home 으로 내보냄 */
 function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   if (isLoggedIn) return <Navigate to="/home" replace />;
   return <>{children}</>;
 }
 
-/** 404 페이지 (간단 버전) */
 function NotFound() {
   return <div className="mt-24 text-center text-gray-600">페이지를 찾을 수 없습니다.</div>;
 }
@@ -123,8 +120,9 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+        {/* ★★★ 챗봇 동적 경로로 수정 ★★★ */}
         <Route
-          path="/chatbot"
+          path="/chatbot/:childId"
           element={
             <ProtectedRoute>
               <ChatbotPage />

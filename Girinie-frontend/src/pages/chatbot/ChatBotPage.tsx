@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, FormEvent } from "react";
+import { useParams } from "react-router-dom"; // ★★★ useParams 임포트 ★★★
 import ChildSidebar from "@/components/common/ChildSidebar";
 import { Send } from "lucide-react";
 import { useChildData } from "@/hooks/useChildData";
 import giraffeIcon from "@/assets/icons/Girinie.svg";
 import LevelButton from "../chatbot/components/LevelButton";
-import { startChat, sendChatMessage, getChatHistory, type ChatMessage } from "@/api/chat";
+import { startChat, sendChatMessage, getChatHistory } from "@/api/chat";
 
 interface Message {
   id: number;
@@ -12,45 +13,67 @@ interface Message {
   text: string;
 }
 
-export default function ChatBotPage() {
-  const { data: children = [] } = useChildData();
-  const child = children[0];
+const CATEGORY_MAP = {
+  "질서": "order",
+  "예절": "manners",
+  "자조": "selfcare",
+  "청결": "clean",
+  "절약": "saving",
+  "식습관": "eating",
+  "감정조절": "calm",
+  "존중": "kindness",
+};
+type CategoryLabel = keyof typeof CATEGORY_MAP;
 
+export default function ChatBotPage() {
+  const { childId } = useParams(); // ★★★ URL에서 자녀 ID 가져오기 ★★★
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [categoryPicked, setCategoryPicked] = useState<string | null>(null);
+  const [childLevel, setChildLevel] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 첫 진입: 환영 + 기존 세션 이어받기 시도
   useEffect(() => {
-    setMessages([
-      { id: Date.now(), sender: "bot", text: "안녕? 오늘은 어떤 걸 공부해볼까?" },
-    ]);
     (async () => {
-      if (!child?.id) return;
+      const welcomeMessage: Message = { id: Date.now(), sender: "bot", text: "안녕? 오늘은 어떤 걸 공부해볼까?" };
+      
+      // ★★★ childId가 없으면 로직을 실행하지 않음 ★★★
+      if (!childId) {
+        setMessages([welcomeMessage]);
+        return;
+      }
+
       try {
-        const history = await getChatHistory(child.id);
+        // ★★★ 가져온 childId를 사용 ★★★
+        const history = await getChatHistory(Number(childId));
         const active = history?.find(s => s.is_active);
+        
         if (active) {
           setSessionId(active.id);
           setCategoryPicked(active.category);
-          // 서버 메시지를 UI 포맷으로 변환
+          setChildLevel(active.current_level);
+          
           const restored = active.messages.map<Message>(m => ({
             id: m.id,
             sender: m.sender === "user" ? "user" : "bot",
             text: m.content,
           }));
-          setMessages(prev => [
-            { id: Date.now() + 1, sender: "bot", text: `이어서 진행할게! (카테고리: ${active.category})` },
-            ...prev,
+          
+          setMessages([
+            welcomeMessage,
             ...restored,
+            { id: Date.now() + 1, sender: "bot", text: `이어서 진행할게! (카테고리: ${active.category})` },
           ]);
+        } else {
+          setMessages([welcomeMessage]);
         }
-      } catch { /* 이어받기 실패는 무시 */ }
+      } catch {
+        setMessages([welcomeMessage]);
+      }
     })();
-  }, [child?.id]);
+  }, [childId]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -69,17 +92,23 @@ export default function ChatBotPage() {
       return next;
     });
 
-  // 카테고리 버튼 클릭 → 세션 시작
-  const handleLevelClick = async (label: string) => {
-    if (!child?.id || sending) return;
+  const handleLevelClick = async (label: CategoryLabel) => {
+    if (!childId || sending) return;
     setCategoryPicked(label);
     push(label, "user");
     setSending(true);
     push("...", "typing");
+    const englishCategory = CATEGORY_MAP[label];
+    if (!englishCategory) {
+      replaceLastTyping("잘못된 학습 주제입니다.");
+      setSending(false);
+      return;
+    }
     try {
-      const session = await startChat({ child_id: child.id, category: label });
+      // ★★★ 가져온 childId를 사용 ★★★
+      const session = await startChat({ child_id: Number(childId), category: englishCategory });
       setSessionId(session.id);
-      // 서버가 되돌려준 초기 메시지들 표시
+      setChildLevel(session.current_level);
       const initial = session.messages?.map(m => m.content).join("\n");
       replaceLastTyping(initial || `${label} 학습을 시작할게!`);
     } catch (e) {
@@ -89,7 +118,6 @@ export default function ChatBotPage() {
     }
   };
 
-  // 사용자 입력 전송
   const handleSend = async (e: FormEvent) => {
     e.preventDefault();
     const text = input.trim();
@@ -124,21 +152,17 @@ export default function ChatBotPage() {
     <div className="flex min-h-screen bg-primary">
       <ChildSidebar />
       <div className="mt-25 ml-60 flex flex-col flex-1 relative">
-        {/* 메시지 리스트 */}
         <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24">
           {messages.map((m) => (
             <div key={m.id} className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"} mb-2`}>
               <div className="mt-2 flex gap-2 items-start">
                 {m.sender !== "user" && <img src={giraffeIcon} alt="기린" className="w-10 h-10 mt-1" />}
-                <div className="inline-flex flex-col p-4 bg-white/90 rounded-lg shadow whitespace-pre-wrap">
+                <div className="inline-flex flex-col p-4 bg-white/90 rounded-lg shadow whitespace-pre-wrap max-w-lg">
                   <span>{m.text}</span>
-                  {/* 처음 환영 메시지 밑에 카테고리 버튼 */}
                   {!categoryPicked && m.text.includes("어떤 걸 공부") && (
                     <div className="grid grid-cols-4 gap-2 mt-3">
-                      {[
-                        "질서","예절","자조","청결","절약","식습관","감정조절","존중",
-                      ].map((label) => (
-                        <LevelButton key={label} label={label} level={0} onClick={handleLevelClick}/>
+                      {Object.keys(CATEGORY_MAP).map((label) => (
+                        <LevelButton key={label} label={label} level={childLevel} onClick={() => handleLevelClick(label as CategoryLabel)}/>
                       ))}
                     </div>
                   )}
@@ -148,8 +172,6 @@ export default function ChatBotPage() {
           ))}
           <div ref={scrollRef} />
         </div>
-
-        {/* 입력창: 고정 위치 */}
         <form
           onSubmit={handleSend}
           className="w-full px-15 py-8 bg-primary border-t flex items-center gap-2 sticky bottom-0"
