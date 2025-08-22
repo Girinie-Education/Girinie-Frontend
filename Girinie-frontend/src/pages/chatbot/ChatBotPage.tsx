@@ -54,6 +54,7 @@ const getPersist = () => {
     return { catEn: null as string | null, ended: true };
   }
 };
+
 const setPersist = (catEn: string | null, ended: boolean) => {
   try {
     if (catEn) localStorage.setItem(LAST_CAT_EN, catEn);
