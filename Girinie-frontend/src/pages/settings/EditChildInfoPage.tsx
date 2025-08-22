@@ -1,19 +1,39 @@
-import React, { useEffect, useState } from "react";
+// src/pages/settings/EditChildInfoPage.tsx
+import React, { useEffect, useState, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import GuardianSidebar from "@/components/common/GuardianSidebar";
 import { useChildData } from "@/hooks/useChildData";
-import { ChildUser } from "@/lib/childData";
-import giraffeIcon from "@/assets/icons/Girinie.svg";
+import { patchChildUser, ChildUser } from "@/lib/childData";
+import giraffeGreenIcon from "@/assets/icons/scarf/green.svg";
+import giraffeRedIcon from "@/assets/icons/scarf/red.svg";
+import giraffeBlueIcon from "@/assets/icons/scarf/blue.svg";
+import giraffeBrownIcon from "@/assets/icons/scarf/brown.svg";
+import axios from "axios"; 
 
 export default function EditChildInfoPage() {
-  const { data: children = [] } = useChildData();
-  const child = children[0]; // 임시 첫 아이
+  const { childId } = useParams<{ childId: string }>();
+  const { data: children = [], loading, error, refetch } = useChildData();
+
+  const child = useMemo(() => {
+    if (childId && children.length > 0) {
+      return children.find((c) => c.id === Number(childId));
+    }
+    return null;
+  }, [childId, children]);
 
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState(giraffeIcon);
-  const [selectedColor, setSelectedColor] = useState("bg-[#F4B740]");
+  const [selectedAvatarUrl, setSelectedAvatarUrl] = useState("");
+  const [selectedAvatarScarf, setSelectedAvatarScarf] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
 
-  const avatarOptions = [giraffeIcon, giraffeIcon, giraffeIcon, giraffeIcon];
+  const avatarOptions = [
+    { url: giraffeGreenIcon, scarf: "green" },
+    { url: giraffeRedIcon, scarf: "red" },
+    { url: giraffeBlueIcon, scarf: "blue" },
+    { url: giraffeBrownIcon, scarf: "brown" },
+  ];
+
   const colorOptions = [
     "bg-[#F4B740]",
     "bg-[#F5625D]",
@@ -29,10 +49,77 @@ export default function EditChildInfoPage() {
     if (child) {
       setName(child.name);
       setAge(child.age?.toString() || "");
-      setSelectedAvatar(child.avatarUrl || giraffeIcon);
-      setSelectedColor(child.color || "bg-[#F4B740]");
+      const initialAvatar = avatarOptions.find(
+        (opt) => opt.url === child.avatarUrl
+      ) || avatarOptions[0];
+      setSelectedAvatarUrl(initialAvatar.url);
+      setSelectedAvatarScarf(initialAvatar.scarf);
+      setSelectedColor(child.color || colorOptions[0]);
     }
   }, [child]);
+
+  const handleSave = async () => {
+    if (!child) {
+      alert("저장할 자녀 정보가 없습니다.");
+      return;
+    }
+
+    if (!name.trim()) {
+      alert("이름을 입력해주세요.");
+      return;
+    }
+    const ageNum = parseInt(age, 10);
+    if (isNaN(ageNum) || ageNum < 0) {
+      alert("유효한 나이를 입력해주세요.");
+      return;
+    }
+
+    const updateData = {
+      name: name,
+      age: ageNum,
+      avatarUrl: selectedAvatarUrl,
+      color: selectedColor,
+    };
+
+    try {
+      // 백엔드에서 PATCH를 지원하지 않는다면 putChildUser를 호출하도록 변경하세요.
+      await patchChildUser(child.id, updateData);
+      alert("아이 정보가 성공적으로 변경되었습니다.");
+      refetch();
+    } catch (error) {
+      console.error("아이 정보 변경 실패:", error);
+      let errorMessage = "아이 정보 변경 중 알 수 없는 오류가 발생했습니다.";
+      if (axios.isAxiosError(error) && error.response) {
+        const serverError = error.response.data;
+        if (typeof serverError === 'object' && serverError !== null) {
+          errorMessage = (serverError as any).message || (serverError as any).detail || "서버 오류가 발생했습니다.";
+        } else if (typeof serverError === 'string') {
+          errorMessage = serverError;
+        } else {
+          errorMessage = "서버로부터 알 수 없는 오류 응답을 받았습니다.";
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      alert(errorMessage);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-white">
+        <div>로딩 중...</div>
+      </div>
+    );
+  }
+
+  if (error || !child) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-white text-red-500">
+        <div>자녀 정보를 찾을 수 없거나 불러오는 데 실패했습니다.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -45,11 +132,15 @@ export default function EditChildInfoPage() {
 
           {/* 상단: 프로필 + 입력 */}
           <div className="flex items-center gap-6 mb-6 mt-20">
-            <img
-              src={selectedAvatar}
-              alt="선택된 아바타"
-              className="w-28 h-28 rounded-full bg-gray-200 object-cover"
-            />
+            <div
+              className={`w-28 h-28 rounded-full flex items-center justify-center overflow-hidden ${selectedColor} border border-bg-gray`}
+            >
+              <img
+                src={selectedAvatarUrl}
+                alt="선택된 아바타"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <div className="flex flex-col gap-4">
               <div className="flex gap-2 items-center">
                 <label className="w-12">이름</label>
@@ -58,7 +149,7 @@ export default function EditChildInfoPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="border rounded px-3 py-2 w-48 focus:outline-none focus:ring-0"
-                  />
+                />
               </div>
               <div className="flex gap-2 items-center">
                 <label className="w-12">나이</label>
@@ -67,7 +158,7 @@ export default function EditChildInfoPage() {
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
                   className="border rounded px-3 py-2 w-48 focus:outline-none focus:ring-0"
-                  />
+                />
               </div>
             </div>
           </div>
@@ -75,25 +166,27 @@ export default function EditChildInfoPage() {
           <hr className="my-10 border-gray-300" />
 
           {/* 아바타 선택 */}
-        <div className="flex gap-8 mb-10">
-        {avatarOptions.map((icon, idx) => (
-            <button
-            key={idx}
-            onClick={() => setSelectedAvatar(icon)}
-            className="relative p-1 rounded-lg"
-            >
-            <img
-                src={icon}
-                alt={`avatar-${idx}`}
-                className="w-20 h-20 rounded-full object-cover"
-            />
-            {selectedAvatar === icon && (
-                <div className="absolute top-0 left-0 w-full h-full rounded-full ring-4 ring-yellow-400 pointer-events-none" />
-            )}
-            </button>
-        ))}
-        </div>
-
+          <div className="flex gap-8 mb-10">
+            {avatarOptions.map((avatar, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setSelectedAvatarUrl(avatar.url);
+                  setSelectedAvatarScarf(avatar.scarf);
+                }}
+                className="relative p-1 rounded-lg"
+              >
+                <img
+                  src={avatar.url}
+                  alt={`avatar-${avatar.scarf}`}
+                  className="w-23 h-25 rounded-lg object-cover"
+                />
+                {selectedAvatarUrl === avatar.url && (
+                  <div className="absolute top-0 left-0 w-full h-full rounded-lg ring-4 ring-yellow-400 pointer-events-none" />
+                )}
+              </button>
+            ))}
+          </div>
 
           <hr className="my-6 border-gray-300" />
 
@@ -102,7 +195,7 @@ export default function EditChildInfoPage() {
             {colorOptions.map((color, idx) => (
               <button
                 key={idx}
-                className={`w-14 h-14 rounded-full ${color} relative`}
+                className={`mt-9 w-14 h-14 rounded-full ${color} relative`}
                 onClick={() => setSelectedColor(color)}
               >
                 {selectedColor === color && (
@@ -116,7 +209,10 @@ export default function EditChildInfoPage() {
 
           {/* 저장 버튼 */}
           <div className="text-right">
-            <button className="bg-tertiary text-white px-6 py-2 rounded hover:opacity-90 transition">
+            <button
+              onClick={handleSave}
+              className="bg-yellow-400 text-white px-6 py-2 rounded hover:opacity-90 transition"
+            >
               변경 저장
             </button>
           </div>
@@ -125,3 +221,9 @@ export default function EditChildInfoPage() {
     </div>
   );
 }
+
+
+
+
+
+
