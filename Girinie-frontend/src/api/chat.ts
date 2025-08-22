@@ -4,19 +4,20 @@ export type Sender = "user" | "assistant";
 
 export interface ChatMessage {
   id: number;
-  sender: Sender;          // "user" | "assistant"
+  sender: Sender;       
   content: string;
-  created_at: string;
+  created_at: string;  
 }
 
 export interface ChatSession {
   id: number;
-  category: string;        // 스웨거 enum (질서/예절/...)
+  category: string;      
   current_level: number;
   scenario: string;
   is_active: boolean;
   progress_score: number;
-  messages: ChatMessage[]; // 읽기 전용 목록
+  messages?: ChatMessage[]; 
+  created_at: string;
 }
 
 export interface StartChatBody {
@@ -35,10 +36,11 @@ export interface SendMessageBody {
   session_id: number;
   content: string;
 }
+
 export interface SendMessageResult {
-  feedback: string;     // AI 피드백
-  score: number;        // 1~5
-  level_up?: string;    // 레벨업 메시지(옵션)
+  feedback: string;
+  score: number;
+  level_up?: string;
   next_question?: string;
   session_ended: boolean;
 }
@@ -50,9 +52,25 @@ export async function sendChatMessage(body: SendMessageBody) {
   return data;
 }
 
-export async function getChatHistory(childId: number) {
-  const { data } = await apiClient.get<ChatSession[]>("/chat/history/" + childId + "/", {
+export async function listAllSessions(childId: number) {
+  const { data } = await apiClient.post<ChatSession[]>("/chat/history/", { child_id: childId }, {
     withCredentials: true,
   });
+  return data;
+}
+
+/** 세션별 메시지 페이지네이션: before 이전의 오래된 메시지부터 limit개 (오래된→최신) */
+export async function listSessionMessages(
+  sessionId: number,
+  params: { before?: number; limit?: number } = {}
+) {
+  const query = new URLSearchParams();
+  if (params.before != null) query.set("before", String(params.before));
+  if (params.limit != null) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  const { data } = await apiClient.get<ChatMessage[]>(
+    `/chat/sessions/${sessionId}/messages/${qs ? `?${qs}` : ""}`,
+    { withCredentials: true }
+  );
   return data;
 }

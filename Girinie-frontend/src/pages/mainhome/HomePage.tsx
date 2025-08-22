@@ -1,13 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import ProfileCard from "./components/ProfileCard";
 import StickerBoard from "./components/StickerBoard";
 import DailyQuote from "./components/DailyQuote";
 import UpcomingLesson from "./components/UpcomingLesson";
 import StreakPanel from "./components/StreakPanel";
+import ArrowButton from "./components/ArrowButton";
 import { useHomeData } from "@/hooks/useHomeData";
 
 const HomePage: React.FC = () => {
   const { data, loading, error } = useHomeData();
+  const [childIndex, setChildIndex] = useState(0);
+
+  const handleNextChild = () => {
+    if (data && data.length > 0) {
+      setChildIndex((prevIndex) => (prevIndex + 1) % data.length);
+    }
+  };
+
+  const handlePrevChild = () => {
+    if (data && data.length > 0) {
+      setChildIndex((prevIndex) => (prevIndex - 1 + data.length) % data.length);
+    }
+  };
 
   if (loading) {
     return (
@@ -25,7 +39,6 @@ const HomePage: React.FC = () => {
     );
   }
 
-  // 데이터가 없거나 비어있는 경우 명확한 메시지를 표시
   if (!data || data.length === 0) {
     return (
       <div className="mt-20 min-h-screen flex items-center justify-center">
@@ -34,13 +47,30 @@ const HomePage: React.FC = () => {
     );
   }
 
-  const currentChild = data[0];
+  const currentChild = data[childIndex];
   const isBlurred = !currentChild;
 
+  // 순환 기능 적용으로 버튼은 항상 활성화
+  const showButton = data.length > 1;
+
   return (
-    <div className="mt-20 min-h-screen bg-primary">
+    <div className="mt-20 min-h-screen bg-primary relative"> {/* relative 추가 */}
       <div className="mx-auto max-w-3xl lg:max-w-5xl px-4 md:px-6 py-6 md:py-8">
-        <div className="mt-10 relative rounded-2xl bg-white border border-gray-200 shadow-sm p-5 md:p-7">
+        {showButton && (
+          <>
+            <ArrowButton
+              side="left"
+              visible={true} // 항상 활성화
+              onClick={handlePrevChild}
+            />
+            <ArrowButton
+              side="right"
+              visible={true} // 항상 활성화
+              onClick={handleNextChild}
+            />
+          </>
+        )}
+        <div className="mt-10 rounded-2xl bg-white border border-gray-200 shadow-sm p-5 md:p-7">
           <div className="mb-5 mt-5 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] gap-7 lg:gap-8">
             <div className="min-w-0 space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] items-stretch gap-4 lg:gap-6">
@@ -49,10 +79,14 @@ const HomePage: React.FC = () => {
               </div>
 
               <DailyQuote quote={currentChild?.quote} isBlurred={isBlurred} />
-              <UpcomingLesson conversation={currentChild?.conversation} isBlurred={isBlurred} />
+              <UpcomingLesson
+                conversation={currentChild?.conversation}
+                isBlurred={isBlurred}
+                childId={currentChild?.id || 0}
+              />
 
               <div className="lg:hidden">
-              <StreakPanel days={currentChild?.streak} childName={currentChild?.name} isBlurred={isBlurred} />
+                <StreakPanel days={currentChild?.streak} childName={currentChild?.name} isBlurred={isBlurred} />
               </div>
             </div>
 

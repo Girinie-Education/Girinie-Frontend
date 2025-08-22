@@ -1,3 +1,4 @@
+// src/components/common/ArrowButton.tsx
 import React from "react";
 
 type Props = {
@@ -11,10 +12,10 @@ const ArrowButton: React.FC<Props> = ({ side, visible, onClick }) => (
     type="button"
     aria-label={side === "left" ? "이전 아이" : "다음 아이"}
     onClick={onClick}
-    className={`absolute ${side === "left" ? "left-4" : "right-4"} top-1/2 -translate-y-1/2
-      z-20 grid place-items-center size-8 md:size-9 rounded-full
-      bg-white/90 border ring-1 ring-black/5 shadow
-      ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+    className={`absolute ${side === "left" ? "left-40" : "right-40"} top-1/2 -translate-y-1/2
+      z-20 grid place-items-center size-20 md:size-20
+      ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}
+      text-5xl font-bold text-tertiary hover:text-gray-700 transition`}
   >
     {side === "left" ? "‹" : "›"}
   </button>
