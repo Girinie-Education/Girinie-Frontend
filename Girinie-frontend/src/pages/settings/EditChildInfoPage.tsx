@@ -123,11 +123,11 @@ export default function EditChildInfoPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="flex h-screen">
-        <aside className="mr-4 hidden lg:flex lg:flex-col lg:w-64 lg:h-full overflow-hidden">
+        <aside className="mr-4 hidden overflow-hidden lg:flex lg:h-full lg:w-64 lg:flex-col">
           <GuardianSidebar />
         </aside>
-        <main className="mt-20 ml-50 flex-1 px-10 py-10">
-          <h2 className="text-xl font-semibold mb-6">아이 정보 변경</h2>
+        <main className="ml-50 mt-20 flex-1 px-10 py-10">
+          <h2 className="mb-6 text-xl font-semibold">아이 정보 변경</h2>
 
           {/* 상단: 프로필 + 입력 */}
           <div className="flex items-center gap-6 mb-6 mt-20">
@@ -141,7 +141,7 @@ export default function EditChildInfoPage() {
               />
             </div>
             <div className="flex flex-col gap-4">
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <label className="w-12">이름</label>
                 <input
                   type="text"
@@ -150,7 +150,7 @@ export default function EditChildInfoPage() {
                   className="border rounded px-3 py-2 w-48 focus:outline-none focus:ring-0"
                 />
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <label className="w-12">나이</label>
                 <input
                   type="number"
@@ -190,7 +190,7 @@ export default function EditChildInfoPage() {
           <hr className="my-6 border-gray-300" />
 
           {/* 색상 선택 */}
-          <div className="flex flex-wrap gap-x-8 gap-y-4 mb-20">
+          <div className="mb-20 flex flex-wrap gap-x-8 gap-y-4">
             {colorOptions.map((color, idx) => (
               <button
                 key={idx}
@@ -198,7 +198,7 @@ export default function EditChildInfoPage() {
                 onClick={() => setSelectedColor(color)}
               >
                 {selectedColor === color && (
-                  <div className="absolute top-0 left-0 w-full h-full border-4 border-white rounded-full shadow-md ring-2 ring-yellow-400 pointer-events-none" />
+                  <div className="pointer-events-none absolute left-0 top-0 h-full w-full rounded-full border-4 border-white shadow-md ring-2 ring-yellow-400" />
                 )}
               </button>
             ))}

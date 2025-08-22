@@ -80,15 +80,17 @@ const Calendar: React.FC<CalendarProps> = ({ mode, onDayClick, renderStamp, high
               return (
                 <div
                   key={i}
-                  className={`relative aspect-square cursor-pointer border-b border-r border-gray-300 p-2 text-left ${
+                  className={`relative aspect-square cursor-pointer border-b border-r border-gray-300 p-2 flex flex-col overflow-hidden ${
                     isTodayHighlighted ? "bg-[#FFE76A]" : ""
                   }`}
                   onClick={() => onDayClick?.(date)}
                 >
-                  <div className={`text-lg font-semibold ${isSunday ? "text-[#FF6464]" : ""}`}>
+                  <div className={`text-lg font-semibold self-start ${isSunday ? "text-[#FF6464]" : ""}`}>
                     {i + 1}
                   </div>
-                  <div className="text-center">{renderStamp?.(date)}</div>
+                  <div className="flex-1 flex items-center justify-center">
+                    {renderStamp?.(date)}
+                  </div>
                 </div>
               );
             }),

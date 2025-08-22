@@ -6,7 +6,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const { data: children, loading, error } = useChildData();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname.startsWith(path);
 
   const selectedChild = children?.[0] ?? null;
 
@@ -32,19 +32,27 @@ const Sidebar = () => {
       <nav className="divide-y divide-[#D9D9D9] border-t border-[#D9D9D9]">
         <div
           className={`cursor-pointer px-8 py-4 hover:text-tertiary ${
-            isActive("/chatbot") ? "font-bold text-black" : "text-gray-400"
+            isActive(`/chatbot/${selectedChild?.id}`) ? "font-bold text-black" : "text-gray-400"
           }`}
-          onClick={() => navigate("/chatbot")}
+          onClick={() => navigate(`/chatbot/${selectedChild?.id}`)}
         >
           챗봇
         </div>
         <div
           className={`cursor-pointer px-8 py-4 hover:text-tertiary ${
-            isActive("/learning-rate") ? "font-bold text-black" : "text-gray-400"
+            isActive(`/learning-rate/${selectedChild?.id}`) ? "font-bold text-black" : "text-gray-400"
           }`}
-          onClick={() => navigate("/learning-rate")}
+          onClick={() => navigate(`/learning-rate/${selectedChild?.id}`)}
         >
           학습률
+        </div>
+        <div
+          className={`cursor-pointer px-8 py-4 hover:text-tertiary ${
+            isActive(`/calendar/kid/${selectedChild?.id}`) ? "font-bold text-black" : "text-gray-400"
+          }`}
+          onClick={() => navigate(`/calendar/kid/${selectedChild?.id}`)}
+        >
+          캘린더
         </div>
       </nav>
       <hr className="border-t border-[#D9D9D9]" />

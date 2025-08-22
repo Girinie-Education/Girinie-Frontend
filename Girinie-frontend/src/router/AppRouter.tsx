@@ -138,7 +138,23 @@ export default function AppRouter() {
           }
         />
         <Route
+          path="/learning-rate/:id"
+          element={
+            <ProtectedRoute>
+              <LearningRatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/calendar/:role"
+          element={
+            <ProtectedRoute>
+              <CalendarRouterPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calendar/:role/:childId"
           element={
             <ProtectedRoute>
               <CalendarRouterPage />

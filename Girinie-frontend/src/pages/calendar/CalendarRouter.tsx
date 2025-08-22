@@ -6,9 +6,9 @@ import ChildPage from "../child/ChildPage";
 import GuardianPage from "../gardian/GuardianPage";
 
 export default function CalendarRouterPage() {
-  const { role } = useParams<{ role: string }>();
+  const { role, childId } = useParams<{ role?: string; childId?: string }>();
 
-  if (role === "kid") {
+  if (role === "kid" || role === "child") {
     return (
       <ChildPage>
         <KidCalendarPage />

@@ -1,58 +1,60 @@
 import React from "react";
-import {
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  BarChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Bar,
-  ResponsiveContainer,
-} from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import LearningRateCharts from "@/components/common/LearningRateCharts";
+import { 
+  fetchAllLevelUpLogs, 
+  fetchChildUser,
+  transformLogsToChartData, 
+  transformChildUserToChartData 
+} from "@/api/levelup";
 
-const radarData = [
-  { subject: "질서", A: 80 },
-  { subject: "배려", A: 65 },
-  { subject: "책임", A: 90 },
-  { subject: "정직", A: 70 },
-  { subject: "표현", A: 50 },
-  { subject: "집중", A: 75 },
-];
+interface ProgressModalProps {
+  childId?: number;
+}
 
-const barData = [
-  { name: "질서", level: 3 },
-  { name: "배려", level: 2 },
-  { name: "책임", level: 4 },
-  { name: "정직", level: 3 },
-  { name: "표현", level: 1 },
-  { name: "집중", level: 2 },
-];
+const ProgressModal: React.FC<ProgressModalProps> = ({ childId }) => {
+  const { data: logs = [], isLoading: isLogsLoading, error: logsError } = useQuery({
+    queryKey: ["levelupLogs", childId],
+    queryFn: () => childId ? import("@/api/levelup").then(api => api.fetchChildLevelUpLogs(childId)) : fetchAllLevelUpLogs(),
+  });
 
-const ProgressModal: React.FC = () => {
+  const { data: child, isLoading: isChildLoading, error: childError } = useQuery({
+    queryKey: ["child", childId],
+    queryFn: () => fetchChildUser(childId!),
+    enabled: !!childId,
+  });
+
+  const chartData = child ? transformChildUserToChartData(child) : transformLogsToChartData(logs);
+  const isLoading = isLogsLoading || isChildLoading;
+  const error = logsError || childError;
+
+  if (isLoading) {
+    return (
+      <div className="w-[800px] rounded bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-bold">학습률 상세 보기</h2>
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="text-lg">학습률 데이터를 불러오는 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-[800px] rounded bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-bold">학습률 상세 보기</h2>
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="text-lg text-red-500">데이터를 불러오는 중 오류가 발생했습니다.</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-[800px] rounded bg-white p-6 shadow-lg">
       <h2 className="mb-4 text-xl font-bold">학습률 상세 보기</h2>
-      <div className="mb-8 flex gap-8">
-        <RadarChart cx={150} cy={150} outerRadius={100} width={300} height={300} data={radarData}>
-          <PolarGrid />
-          <PolarAngleAxis dataKey="subject" />
-          <PolarRadiusAxis angle={30} domain={[0, 100]} />
-          <Radar name="평가" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-        </RadarChart>
-
-        <ResponsiveContainer width={400} height={300}>
-          <BarChart data={barData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" domain={[0, 4]} />
-            <YAxis type="category" dataKey="name" />
-            <Tooltip />
-            <Bar dataKey="level" fill="#ffd054" />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="mb-8">
+        <LearningRateCharts data={chartData} />
       </div>
 
       <div className="mb-4">
