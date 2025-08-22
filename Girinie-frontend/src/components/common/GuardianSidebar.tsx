@@ -46,9 +46,9 @@ const GuardianSidebar: React.FC = () => {
           {children.map(child => (
             <li
               key={child.id}
-              onClick={() => navigate(`/child/${child.id}`)}
+              onClick={() => navigate(`/calendar/parent/${child.id}`)}
               className={`flex items-center space-x-2 px-4 py-2 rounded cursor-pointer transition ${
-                isActive(`/child/${child.id}`)
+                isActive(`/calendar/parent/${child.id}`)
                   ? 'bg-gray-100 font-semibold text-black'
                   : 'text-gray-500'
               }`}

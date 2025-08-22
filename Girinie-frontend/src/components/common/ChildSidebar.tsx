@@ -121,18 +121,18 @@ const ChildSidebar: React.FC = () => {
           </div>
           <hr className="my-1 border-gray-200" />
           <div
-            onClick={() => navigate("/learningrate")}
+            onClick={() => navigate(`/learning-rate/${currentChild.id}`)}
             className={`cursor-pointer px-8 py-4 transition hover:text-secondary ${
-              isActive("/learningrate") ? "font-semibold text-black" : "text-gray-500"
+              isActive("/learning-rate") ? "font-semibold text-black" : "text-gray-500"
             }`}
           >
             학습률
           </div>
           <hr className="my-1 border-gray-200" />
           <div
-            onClick={() => navigate("/calendar/child")}
+            onClick={() => navigate(`/calendar/kid/${currentChild.id}`)}
             className={`cursor-pointer px-8 py-4 transition hover:text-secondary ${
-              isActive("/calendar/child") ? "font-semibold text-black" : "text-gray-500"
+              isActive("/calendar/kid") ? "font-semibold text-black" : "text-gray-500"
             }`}
           >
             캘린더

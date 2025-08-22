@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { fetchKidStamps } from "@/api/kid";
 import Calendar from "@/components/calendar/Calendar";
 
 export default function KidCalendarPage() {
   const [stamps, setStamps] = useState<Record<string, any[]>>({});
-  const [childId, setChildId] = useState("default-id"); // 필요시 외부에서 받아올 수도 있음
+  const { childId } = useParams<{ childId: string }>();
 
   // 오늘 날짜
   const today = new Date();
 
   useEffect(() => {
+    if (!childId) return;
+
     const yyyy = today.getFullYear().toString();
     const mm = String(today.getMonth() + 1).padStart(2, "0");
     let cancelled = false;
@@ -68,6 +71,19 @@ export default function KidCalendarPage() {
       date.getDate() === today.getDate()
     );
   };
+
+  if (!childId) {
+    return (
+      <div className="min-h-screen bg-[#F7E0AF] p-6">
+        <div className="flex py-20 items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">자녀를 선택해주세요</h2>
+            <p className="text-gray-500">사이드바에서 자녀를 선택하면 해당 자녀의 캘린더를 볼 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F7E0AF] p-6">

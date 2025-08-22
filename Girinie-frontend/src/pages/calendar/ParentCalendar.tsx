@@ -27,6 +27,14 @@ export default function ParentCalendarPage() {
     return first ? String(first) : undefined;
   }, [childId, children]);
 
+  // 첫번째 자녀로 리다이렉트 (URL 파라미터가 없고 자녀가 있을 때)
+  useEffect(() => {
+    if (!childId && children && children.length > 0) {
+      const firstChildId = children[0].id;
+      navigate(`/calendar/parent/${firstChildId}`, { replace: true });
+    }
+  }, [childId, children, navigate]);
+
   useEffect(() => {
     const today = new Date();
     const yyyy = String(today.getFullYear());

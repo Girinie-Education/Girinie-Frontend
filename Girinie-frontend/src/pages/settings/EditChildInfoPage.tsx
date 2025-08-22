@@ -37,37 +37,37 @@ export default function EditChildInfoPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="flex h-screen">
-        <aside className="mr-4 hidden lg:flex lg:flex-col lg:w-64 lg:h-full overflow-hidden">
+        <aside className="mr-4 hidden overflow-hidden lg:flex lg:h-full lg:w-64 lg:flex-col">
           <GuardianSidebar />
         </aside>
-        <main className="mt-20 ml-50 flex-1 px-10 py-10">
-          <h2 className="text-xl font-semibold mb-6">아이 정보 변경</h2>
+        <main className="ml-50 mt-20 flex-1 px-10 py-10">
+          <h2 className="mb-6 text-xl font-semibold">아이 정보 변경</h2>
 
           {/* 상단: 프로필 + 입력 */}
-          <div className="flex items-center gap-6 mb-6 mt-20">
+          <div className="mb-6 mt-20 flex items-center gap-6">
             <img
               src={selectedAvatar}
               alt="선택된 아바타"
-              className="w-28 h-28 rounded-full bg-gray-200 object-cover"
+              className="h-28 w-28 rounded-full bg-gray-200 object-cover"
             />
             <div className="flex flex-col gap-4">
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <label className="w-12">이름</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="border rounded px-3 py-2 w-48 focus:outline-none focus:ring-0"
-                  />
+                  className="w-48 rounded border px-3 py-2 focus:outline-none focus:ring-0"
+                />
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <label className="w-12">나이</label>
                 <input
                   type="number"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="border rounded px-3 py-2 w-48 focus:outline-none focus:ring-0"
-                  />
+                  className="w-48 rounded border px-3 py-2 focus:outline-none focus:ring-0"
+                />
               </div>
             </div>
           </div>
@@ -75,38 +75,37 @@ export default function EditChildInfoPage() {
           <hr className="my-10 border-gray-300" />
 
           {/* 아바타 선택 */}
-        <div className="flex gap-8 mb-10">
-        {avatarOptions.map((icon, idx) => (
-            <button
-            key={idx}
-            onClick={() => setSelectedAvatar(icon)}
-            className="relative p-1 rounded-lg"
-            >
-            <img
-                src={icon}
-                alt={`avatar-${idx}`}
-                className="w-20 h-20 rounded-full object-cover"
-            />
-            {selectedAvatar === icon && (
-                <div className="absolute top-0 left-0 w-full h-full rounded-full ring-4 ring-yellow-400 pointer-events-none" />
-            )}
-            </button>
-        ))}
-        </div>
-
+          <div className="mb-10 flex gap-8">
+            {avatarOptions.map((icon, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSelectedAvatar(icon)}
+                className="relative rounded-lg p-1"
+              >
+                <img
+                  src={icon}
+                  alt={`avatar-${idx}`}
+                  className="h-20 w-20 rounded-full object-cover"
+                />
+                {selectedAvatar === icon && (
+                  <div className="pointer-events-none absolute left-0 top-0 h-full w-full rounded-full ring-4 ring-yellow-400" />
+                )}
+              </button>
+            ))}
+          </div>
 
           <hr className="my-6 border-gray-300" />
 
           {/* 색상 선택 */}
-          <div className="flex flex-wrap gap-x-8 gap-y-4 mb-20">
+          <div className="mb-20 flex flex-wrap gap-x-8 gap-y-4">
             {colorOptions.map((color, idx) => (
               <button
                 key={idx}
-                className={`w-14 h-14 rounded-full ${color} relative`}
+                className={`h-14 w-14 rounded-full ${color} relative`}
                 onClick={() => setSelectedColor(color)}
               >
                 {selectedColor === color && (
-                  <div className="absolute top-0 left-0 w-full h-full border-4 border-white rounded-full shadow-md ring-2 ring-yellow-400 pointer-events-none" />
+                  <div className="pointer-events-none absolute left-0 top-0 h-full w-full rounded-full border-4 border-white shadow-md ring-2 ring-yellow-400" />
                 )}
               </button>
             ))}
@@ -116,7 +115,7 @@ export default function EditChildInfoPage() {
 
           {/* 저장 버튼 */}
           <div className="text-right">
-            <button className="bg-tertiary text-white px-6 py-2 rounded hover:opacity-90 transition">
+            <button className="rounded bg-tertiary px-6 py-2 text-white transition hover:opacity-90">
               변경 저장
             </button>
           </div>
