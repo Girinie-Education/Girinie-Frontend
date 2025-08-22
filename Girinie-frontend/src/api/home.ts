@@ -1,7 +1,7 @@
 import { apiClient } from "./common";
 
 export interface HomeChildData {
-  // id: number;
+  id: number;
   name: string;
   age: number;
   avatarUrl: string;
