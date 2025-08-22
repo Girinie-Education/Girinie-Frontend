@@ -9,6 +9,7 @@ export interface HomeChildData {
   top_3_stickers: Sticker[];
   quote: string;
   conversation: string;
+  color: string;
 }
 
 export interface Sticker {
