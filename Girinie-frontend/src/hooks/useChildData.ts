@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// src/hooks/useChildData.ts
+import { useState, useEffect, useCallback } from "react";
 import { fetchChildUsers, ChildUser } from "@/lib/childData";
 
 export const useChildData = () => {
@@ -6,13 +7,22 @@ export const useChildData = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
-    fetchChildUsers()
-      .then((list) => setData(list))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    setError(null);
+    try {
+      const list = await fetchChildUsers();
+      setData(list);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { data, loading, error };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
 };

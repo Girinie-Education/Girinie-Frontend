@@ -9,7 +9,7 @@ const ChildSidebar: React.FC = () => {
   const isLoggedIn = useAuthStore(state => state.isLoggedIn);
   const location = useLocation();
   const navigate = useNavigate();
-  const { childId } = useParams<{ childId?: string }>();  // ★ 현재 선택된 childId
+  const { childId } = useParams<{ childId?: string }>();
   const { data: children = [], loading, error } = useChildData();
 
   const [isChildListOpen, setIsChildListOpen] = useState(false);
@@ -42,7 +42,6 @@ const ChildSidebar: React.FC = () => {
     );
   }
 
-  // URL의 childId가 있으면 그 아이를, 없으면 첫 아이를 선택
   const selectedId = childId ? Number(childId) : children[0].id;
   const currentChild = children.find(c => c.id === selectedId) ?? children[0];
   const otherChildren = children.filter(c => c.id !== currentChild.id);
@@ -60,11 +59,13 @@ const ChildSidebar: React.FC = () => {
                 : "text-gray-500"
             }`}
           >
-            <img
-              src={currentChild.avatarUrl || GirinieIcon}
-              alt={currentChild.name}
-              className="mb-3 h-24 w-24 rounded-full bg-gray-200"
-            />
+            <div className={`mb-3 h-24 w-24 rounded-full flex items-center justify-center overflow-hidden ${currentChild.color || 'bg-gray-200'}`}>
+              <img
+                src={currentChild.avatarUrl || GirinieIcon}
+                alt={currentChild.name}
+                className="w-full h-full object-contain"
+              />
+            </div>
             <span className="text-base font-semibold text-gray-800 transition hover:text-secondary">
               {currentChild.name}
             </span>
@@ -89,18 +90,20 @@ const ChildSidebar: React.FC = () => {
                 {otherChildren.map((child) => (
                   <li
                     key={child.id}
-                    onClick={() => navigate(`/chatbot/${child.id}`)} // ★ 클릭 시 URL 변경
+                    onClick={() => navigate(`/chatbot/${child.id}`)}
                     className={`flex cursor-pointer items-center space-x-2 rounded px-2 py-2 transition ${
                       selectedId === child.id
                         ? "bg-gray-100 font-semibold text-black"
                         : "text-gray-500 hover:text-secondary"
                     }`}
                   >
-                    <img
-                      src={child.avatarUrl || GirinieIcon}
-                      alt={child.name}
-                      className="h-8 w-8 rounded-full bg-gray-200"
-                    />
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center overflow-hidden ${child.color || 'bg-gray-200'}`}>
+                      <img
+                        src={child.avatarUrl || GirinieIcon}
+                        alt={child.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                     <span className="text-sm font-medium">{child.name}</span>
                   </li>
                 ))}
@@ -112,7 +115,7 @@ const ChildSidebar: React.FC = () => {
         {/* 하단 메뉴 */}
         <nav className="m-0 border-b border-gray-300 p-0">
           <div
-            onClick={() => navigate(`/chatbot/${currentChild.id}`)} 
+            onClick={() => navigate(`/chatbot/${currentChild.id}`)}
             className={`cursor-pointer px-8 py-4 transition hover:text-secondary ${
               isActive("/chatbot") ? "font-semibold text-black" : "text-gray-500"
             }`}

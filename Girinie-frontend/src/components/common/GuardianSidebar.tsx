@@ -53,11 +53,13 @@ const GuardianSidebar: React.FC = () => {
                   : 'text-gray-500'
               }`}
             >
-              <img
-                src={GirinieIcon}
-                alt={child.name}
-                className="w-12 h-12 rounded-full bg-gray-200 mr-3"
-              />
+              <div className={`w-12 h-12 rounded-full mr-3 flex items-center justify-center overflow-hidden ${child.color || 'bg-gray-200'}`}>
+                <img
+                  src={child.avatarUrl || GirinieIcon}
+                  alt={child.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <span className="text-base font-semibold text-gray-800 hover:text-secondary transition">
                 {child.name}
               </span>

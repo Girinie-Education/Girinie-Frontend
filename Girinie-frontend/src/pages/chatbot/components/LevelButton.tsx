@@ -1,4 +1,3 @@
-// components/LevelButton.tsx
 import React from "react";
 import classNames from "classnames";
 
@@ -9,10 +8,10 @@ interface LevelButtonProps {
 }
 
 export default function LevelButton({ label, level, onClick }: LevelButtonProps) {
-  const getColorClass = (level: number) => {
-    if (level >= 16) return "bg-childLevel-gold";
-    if (level >= 11) return "bg-childLevel-silver";
-    if (level >= 6) return "bg-childLevel-bronze";
+  const getColorClass = (lv: number) => {
+    if (lv >= 16) return "bg-childLevel-gold";
+    if (lv >= 11) return "bg-childLevel-silver";
+    if (lv >= 6)  return "bg-childLevel-bronze";
     return "bg-white";
   };
 
