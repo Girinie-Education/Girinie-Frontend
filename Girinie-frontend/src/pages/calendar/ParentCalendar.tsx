@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Calendar from "@/components/calendar/Calendar";
 import Modal from "@/components/calendar/CalendarModal";
+import StickerStamp from "@/components/calendar/StickerStamp";
 import { fetchMonthlyRewards, type RewardCalendar } from "@/api/parent";
 import { useNavigate, useParams } from "react-router-dom";
 import { useChildData } from "@/hooks/useChildData";
@@ -82,11 +83,14 @@ export default function ParentCalendarPage() {
     const key = date.toISOString().slice(0, 10);
     const items = stamps[key] || [];
     if (items.length === 0) return null;
-    // 간단한 뱃지로 개수만 표기 (디자인에 맞춰 교체 가능)
+    
+    // 해당 날짜의 스티커 표시
+    const item = items[0];
     return (
-      <span className="inline-flex min-w-6 items-center justify-center rounded-full px-2 text-xs font-semibold">
-        {items.length}
-      </span>
+      <StickerStamp 
+        stickerType={item.sticker_type} 
+        size="sm"
+      />
     );
   };
 
