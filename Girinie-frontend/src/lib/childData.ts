@@ -1,4 +1,3 @@
-// src/lib/childData.ts
 import { apiClient } from "@/api/common";
 
 export interface ChildUser {
@@ -35,10 +34,10 @@ export const patchChildUser = (
     .then((r) => r.data);
 };
 
-/** 자녀 정보 전체 수정 (PUT) */
+/** 자녀 정보 전체 수정 (PUT) - JSON 사용 */
 export const putChildUser = (
   childId: number,
-  data: Partial<ChildUser>
+  data: { name: string; age: number; color: string; avatarUrl: string }
 ): Promise<ChildUser> => {
   return apiClient
     .put<ChildUser>(`/child_users/${childId}/`, data)

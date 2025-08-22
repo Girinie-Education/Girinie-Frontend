@@ -1,9 +1,8 @@
-// src/pages/settings/EditChildInfoPage.tsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import GuardianSidebar from "@/components/common/GuardianSidebar";
 import { useChildData } from "@/hooks/useChildData";
-import { patchChildUser, ChildUser } from "@/lib/childData";
+import { putChildUser } from "@/lib/childData";
 import giraffeGreenIcon from "@/assets/icons/scarf/green.svg";
 import giraffeRedIcon from "@/assets/icons/scarf/red.svg";
 import giraffeBlueIcon from "@/assets/icons/scarf/blue.svg";
@@ -74,16 +73,16 @@ export default function EditChildInfoPage() {
       return;
     }
 
+    // API 문서에 따라 name, age, color, avatarUrl을 모두 포함
     const updateData = {
       name: name,
       age: ageNum,
-      avatarUrl: selectedAvatarUrl,
       color: selectedColor,
+      avatarUrl: selectedAvatarUrl,
     };
 
     try {
-      // 백엔드에서 PATCH를 지원하지 않는다면 putChildUser를 호출하도록 변경하세요.
-      await patchChildUser(child.id, updateData);
+      await putChildUser(child.id, updateData);
       alert("아이 정보가 성공적으로 변경되었습니다.");
       refetch();
     } catch (error) {
@@ -221,9 +220,3 @@ export default function EditChildInfoPage() {
     </div>
   );
 }
-
-
-
-
-
-
