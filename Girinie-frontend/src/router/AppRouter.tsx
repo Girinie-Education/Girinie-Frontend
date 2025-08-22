@@ -1,41 +1,90 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Header from "@/components/common/Header";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
-import HomePage from "@/pages/home/HomePage.tsx";
+import { useAuthStore } from "@/stores/authStore";
+
+// 로그인 전 페이지
+import LandingHomePage from "@/pages/home/HomePage"; 
 import LoginPage from "@/pages/login/LoginPage";
-import LoginHomePage from "@/pages/home/LoginHomePage";
 import SignupPage from "@/pages/signup/SignupPage";
 import FindAccountPage from "@/pages/account/FindAccountPage";
-import GuardianPage from "@/pages/gardian/GuardianPage";
+
+// 로그인 후 페이지 (공통)
+import MainHomePage from "@/pages/mainhome/HomePage";
 import ChildPage from "@/pages/child/ChildPage";
 import SettingsPage from "@/pages/settings/SettingPage";
 import ReportPage from "@/pages/report/ReportPage";
+import EditChildInfoPage from "@/pages/settings/EditChildInfoPage";
+
+// 챗봇, 학습속도, 캘린더
 import ChatbotPage from "@/pages/chatbot/ChatBotPage";
-import LearningRagePage from "@/pages/learningrate/LearningRatePage";
+import LearningRatePage from "@/pages/learningrate/LearningRatePage";
 import CalendarRouterPage from "@/pages/calendar/CalendarRouter";
+import ParentCalendarPage from "@/pages/calendar/ParentCalendar";
+
+function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  if (isLoggedIn) return <Navigate to="/home" replace />;
+  return <>{children}</>;
+}
+
+function NotFound() {
+  return <div className="mt-24 text-center text-gray-600">페이지를 찾을 수 없습니다.</div>;
+}
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        {/** ---------- 비로그인 전용 ---------- */}
+        <Route
+          path="/"
+          element={
+            <PublicOnlyRoute>
+              <LandingHomePage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicOnlyRoute>
+              <LoginPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicOnlyRoute>
+              <SignupPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/find-account"
+          element={
+            <PublicOnlyRoute>
+              <FindAccountPage />
+            </PublicOnlyRoute>
+          }
+        />
+
+        {/** ---------- 로그인 필요 ---------- */}
         <Route
           path="/home"
           element={
             <ProtectedRoute>
-              <LoginHomePage />
+              <MainHomePage />
             </ProtectedRoute>
           }
         />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/find-account" element={<FindAccountPage />} />
         <Route
-          path="/gardian"
+          path="/parent"
           element={
             <ProtectedRoute>
-              <GuardianPage />
+              <ParentCalendarPage />
             </ProtectedRoute>
           }
         />
@@ -64,7 +113,16 @@ export default function AppRouter() {
           }
         />
         <Route
-          path="/chatbot"
+          path="/settings/child/:childId/edit"
+          element={
+            <ProtectedRoute>
+              <EditChildInfoPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* ★★★ 챗봇 동적 경로로 수정 ★★★ */}
+        <Route
+          path="/chatbot/:childId"
           element={
             <ProtectedRoute>
               <ChatbotPage />
@@ -75,7 +133,7 @@ export default function AppRouter() {
           path="/learning-rate"
           element={
             <ProtectedRoute>
-              <LearningRagePage />
+              <LearningRatePage />
             </ProtectedRoute>
           }
         />
@@ -87,6 +145,9 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+
+        {/** ---------- 404 ---------- */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

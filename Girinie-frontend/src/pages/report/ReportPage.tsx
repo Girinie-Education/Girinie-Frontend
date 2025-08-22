@@ -1,4 +1,4 @@
-import Sidebar from "../gardian/components/GuardianSidebar"
+import Sidebar from "@/components/common/GuardianSidebar"
 
 export default function ReportPage() {
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import Sidebar from "./components/GuardianSidebar";
+import Sidebar from "@/components/common/GuardianSidebar";
 
 type Props = {
   children?: React.ReactNode;
