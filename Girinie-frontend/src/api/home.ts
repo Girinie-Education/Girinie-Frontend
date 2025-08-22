@@ -1,7 +1,7 @@
 import { apiClient } from "./common";
 
 export interface HomeChildData {
-  id: number;
+  // id: number;
   name: string;
   age: number;
   avatarUrl: string;
@@ -9,6 +9,7 @@ export interface HomeChildData {
   top_3_stickers: Sticker[];
   quote: string;
   conversation: string;
+  color: string;
 }
 
 export interface Sticker {

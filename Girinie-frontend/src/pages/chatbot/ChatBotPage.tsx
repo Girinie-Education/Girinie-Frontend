@@ -1,4 +1,3 @@
-// src/pages/chatbot/ChatBotPage.tsx
 import React, {
   useState,
   useRef,
@@ -28,7 +27,6 @@ interface Message {
   ts?: number;
 }
 
-/** 카테고리 매핑 */
 const CATEGORY_MAP = {
   질서: "order",
   예절: "manners",
@@ -44,7 +42,6 @@ const REVERSE_CATEGORY_MAP: Record<string, CategoryLabel> = Object.fromEntries(
   Object.entries(CATEGORY_MAP).map(([ko, en]) => [en, ko as CategoryLabel])
 ) as Record<string, CategoryLabel>;
 
-/** 로컬 지속 */
 const LAST_CAT_EN = "chat.lastCategoryEn";
 const LAST_ENDED = "chat.lastEnded";
 const getPersist = () => {
@@ -65,7 +62,6 @@ const setPersist = (catEn: string | null, ended: boolean) => {
   } catch {}
 };
 
-/** sender 정규화 */
 const toUiSender = (apiSender: string): "user" | "bot" => {
   const s = (apiSender || "").toLowerCase();
   return s === "user" || s === "child" ? "user" : "bot";
@@ -90,7 +86,6 @@ export default function ChatBotPage() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
 
-  /** 현재 화면에서 이어서 쓰는 세션만 active로 취급 */
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
   const hasActive = currentSessionId != null;
 
@@ -141,7 +136,6 @@ export default function ChatBotPage() {
       return next;
     });
 
-  /** 세션 병합: 각 세션 첫 부분에 주제 선택(system) 삽입 */
   const buildMergedTimeline = useCallback((all: ChatSession[]) => {
     const merged: Message[] = [];
     for (const s of all) {
@@ -160,90 +154,88 @@ export default function ChatBotPage() {
     return merged;
   }, []);
 
-  /** 현재 대화 종료 → 모든 세션 비활성화 + 웰컴 */
   const endCurrentSession = useCallback(() => {
     setCurrentSessionId(null);
-    setSessions((prev) => prev.map((s) => ({ ...s, is_active: false })));
     setPersist(null, true);
-    push("안녕? 오늘은 어떤 걸 공부해볼까?", "bot");
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        sender: "bot",
+        text: "안녕? 오늘은 어떤 걸 공부해볼까?",
+        ts: Date.now(),
+      },
+    ]);
   }, []);
 
-  /** 초기 로딩 */
   useEffect(() => {
     if (childLoading) return;
 
-    const welcome: Message = {
-      id: Date.now(),
-      sender: "bot",
-      text: "안녕? 오늘은 어떤 걸 공부해볼까?",
-      ts: Date.now(),
-    };
-
     if (!effectiveChildId) {
-      setSessions([]);
-      setMessages([welcome]);
+      setMessages([
+        { id: Date.now(), sender: "bot", text: "안녕? 오늘은 어떤 걸 공부해볼까?", ts: Date.now() },
+      ]);
       setCurrentSessionId(null);
       return;
     }
 
-    (async () => {
+    const loadChatHistory = async () => {
       try {
-        const allRaw = await listAllSessions(effectiveChildId);
+        const allSessions = await listAllSessions(effectiveChildId);
+        setSessions(allSessions);
 
-        // 레벨업 문구로 끝난 세션은 비활성 처리(방어)
-        const all = allRaw.map((s) => {
-          const last = (s.messages ?? [])[Math.max((s.messages?.length || 1) - 1, 0)];
-          const endedByLevelUp =
-            !!last && /레벨\s*업|레벨이\s*\d+로\s*올랐|level\s*up/i.test(last.content);
-          return endedByLevelUp ? { ...s, is_active: false } : s;
-        });
+        const activeSession = allSessions.find(s => s.is_active);
+        const nonActiveSessions = allSessions.filter(s => !s.is_active);
 
-        setSessions(all);
-
-        const merged = buildMergedTimeline(all);
-        const persisted = getPersist();
-
-        // 1) persisted가 "진행중(ended=false)"이고, 같은 카테고리의 활성 세션이 1개뿐이면 자동 이어가기
-        if (
-          persisted.catEn &&
-          !persisted.ended &&
-          all.filter((s) => s.is_active).length === 1 &&
-          all.some((s) => s.is_active && s.category === persisted.catEn)
-        ) {
-          setMessages(merged);
-          const only = all.find((s) => s.is_active)!;
-          setCurrentSessionId(only.id);
-          setPersist(only.category, false);
-          return;
+        const mergedMessages = buildMergedTimeline(nonActiveSessions);
+        
+        if (activeSession) {
+          const activeSessionMessages = activeSession.messages
+            ?.map(apiToUi)
+            .sort((a, b) => (a.ts ?? 0) - (b.ts ?? 0)) || [];
+          
+          setMessages([
+            ...mergedMessages,
+            {
+              id: Number(`${activeSession.id}0000`),
+              sender: "system",
+              text: `주제 선택 · ${REVERSE_CATEGORY_MAP[activeSession.category] ?? activeSession.category}`,
+              ts: Date.parse(activeSession.created_at) - 1
+            },
+            ...activeSessionMessages,
+          ]);
+          setCurrentSessionId(activeSession.id);
+          setPersist(activeSession.category, false);
+        } else {
+          setMessages([
+            ...mergedMessages,
+            { id: Date.now(), sender: "bot", text: "안녕? 오늘은 어떤 걸 공부해볼까?", ts: Date.now() },
+          ]);
+          setCurrentSessionId(null);
+          setPersist(null, true);
         }
-
-        // 2) 그 외에는 항상 웰컴 + 주제 선택 유도 (자동 진행 금지)
-        setMessages([...merged, welcome]);
-        setCurrentSessionId(null);
-        const last = all.slice().sort((a, b) => b.id - a.id)[0];
-        setPersist(last?.category ?? null, true);
-      } catch {
-        setSessions([]);
-        setMessages([welcome]);
+      } catch (err) {
+        console.error("Failed to load chat sessions:", err);
+        setMessages([
+          { id: Date.now(), sender: "bot", text: "채팅 기록을 불러오는데 실패했어요.", ts: Date.now() },
+        ]);
         setCurrentSessionId(null);
       } finally {
         setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "auto" }), 0);
       }
-    })();
+    };
+
+    loadChatHistory();
   }, [childLoading, effectiveChildId, buildMergedTimeline]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  /** 주제 선택 */
   const handleLevelClick = async (label: CategoryLabel) => {
     if (!effectiveChildId || sending || hasActive) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), sender: "system", text: `주제 선택 · ${label}`, ts: Date.now() },
-    ]);
+    push(`주제 선택 · ${label}`, "system");
     setSending(true);
     push("...", "typing");
 
@@ -253,14 +245,13 @@ export default function ChatBotPage() {
       setSessions((prev) => [session, ...prev.map((s) => ({ ...s, is_active: false }))]);
       setCurrentSessionId(session.id);
       setPersist(englishCategory, false);
-
-      const initialText = (session.messages ?? []).map((m) => m.content).join("\n");
-      replaceLastTyping(initialText || `${label} 학습을 시작할게!`);
-
-      const botMsgs = (session.messages ?? [])
+      
+      const botMessages = (session.messages ?? [])
         .filter((m) => toUiSender((m as any).sender) === "bot")
         .map(apiToUi);
-      if (botMsgs.length) setMessages((prev) => [...prev, ...botMsgs]);
+      
+      replaceLastTyping(botMessages[0]?.text || `${label} 학습을 시작할게!`);
+      
     } catch {
       replaceLastTyping("세션 시작에 실패했어요. 잠시 후 다시 시도해줘.");
     } finally {
@@ -268,7 +259,6 @@ export default function ChatBotPage() {
     }
   };
 
-  /** 전송 */
   const handleSend = async (e: FormEvent) => {
     e.preventDefault();
     const text = input.trim();
@@ -287,27 +277,25 @@ export default function ChatBotPage() {
     try {
       const res = await sendChatMessage({ session_id: currentSessionId, content: text });
 
-      const feedback = [
-        res.feedback,
-        typeof res.score === "number" ? `\n점수: ${res.score}/5` : "",
-      ]
-        .filter(Boolean)
-        .join("");
-      replaceLastTyping(feedback);
+      const feedback = res.feedback;
 
-      // 레벨업 → 즉시 종료(다른 활성 세션도 모두 끔). next_question 무시.
       if (res.level_up) {
-        push(res.level_up, "bot");
+        replaceLastTyping(`${feedback}\n${res.level_up}`);
         endCurrentSession();
         return;
       }
-
+      
       if (res.session_ended) {
+        replaceLastTyping(feedback);
         endCurrentSession();
         return;
       }
 
-      if (res.next_question) push(res.next_question, "bot");
+      replaceLastTyping(feedback);
+      if (res.next_question) {
+        push(res.next_question, "bot");
+      }
+      
     } catch {
       replaceLastTyping("메시지 전송에 실패했어요. 다시 시도해줘.");
     } finally {

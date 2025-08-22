@@ -17,6 +17,7 @@ export interface ChatSession {
   is_active: boolean;
   progress_score: number;
   messages?: ChatMessage[]; 
+  created_at: string;
 }
 
 export interface StartChatBody {

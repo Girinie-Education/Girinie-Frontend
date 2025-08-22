@@ -63,7 +63,7 @@ const ChildSidebar: React.FC = () => {
               <img
                 src={currentChild.avatarUrl || GirinieIcon}
                 alt={currentChild.name}
-                className="w-full h-full object-contain"
+                className="mt-3 w-full h-full object-contain"
               />
             </div>
             <span className="text-base font-semibold text-gray-800 transition hover:text-secondary">
