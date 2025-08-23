@@ -82,7 +82,6 @@ export default function SettingPage() {
       const res = await apiClient.post("/parent_users/logout/");
       console.log("[auth] logout:", res.data);
       alert("로그아웃 되었습니다.");
-      // 세션/쿠키 기반이므로 새로고침으로 세션 상태 반영
       navigate("/login");
       window.location.reload();
     } catch (err: any) {
@@ -144,7 +143,6 @@ export default function SettingPage() {
 
             {/* 노란 박스 패딩 조정 */}
             <div className="relative mx-auto w-full max-w-5xl overflow-visible rounded-lg bg-yellow-100 px-6 py-8 shadow-md">
-              {/* justify-center + gap-6 */}
               <div className="flex items-center justify-center gap-6">
                 {visibleItems.map((item, idx) =>
                   item === "ADD" ? (

@@ -73,7 +73,6 @@ export default function EditChildInfoPage() {
       return;
     }
 
-    // API 문서에 따라 name, age, color, avatarUrl을 모두 포함
     const updateData = {
       name: name,
       age: ageNum,
@@ -132,7 +131,7 @@ export default function EditChildInfoPage() {
           {/* 상단: 프로필 + 입력 */}
           <div className="flex items-center gap-6 mb-6 mt-20">
             <div
-              className={`w-28 h-28 rounded-full flex items-center justify-center overflow-hidden ${selectedColor} border border-bg-gray`}
+              className={`w-28 h-28 rounded-full flex items-center justify-center overflow-hidden ${child?.color || 'bg-gray-200'} border border-bg-gray`}
             >
               <img
                 src={selectedAvatarUrl}
