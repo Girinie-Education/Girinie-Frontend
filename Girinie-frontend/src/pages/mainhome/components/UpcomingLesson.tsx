@@ -1,29 +1,58 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // useNavigate import
+import { useNavigate, useParams } from "react-router-dom";
 import Card from "./Card";
 import Girinie from "@/assets/icons/Girinieprofile.svg";
+import { useHomeData } from "@/hooks/useHomeData";
 
-// props 타입에 childId를 추가합니다.
-type Props = { conversation: string | undefined; isBlurred?: boolean; childId: number };
+const UpcomingLesson: React.FC = () => {
+  const navigate = useNavigate();
+  const { childId: childIdFromUrl } = useParams<{ childId: string }>();
+  const { data: children, loading, error } = useHomeData();
 
-const UpcomingLesson: React.FC<Props> = ({ conversation, isBlurred = false, childId }) => {
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const currentChild = React.useMemo(() => {
+    if (!children) return null;
+    const id = childIdFromUrl ? Number(childIdFromUrl) : children[0]?.id;
+    return children.find(c => c.id === id) || children[0];
+  }, [children, childIdFromUrl]);
+
+  if (loading) {
+    return (
+      <Card title="회화 표현 학습하기" className="blur-sm">
+        <div className="mt-3 relative p-4 md:p-6 text-center text-gray-500">
+          데이터 로딩 중...
+        </div>
+      </Card>
+    );
+  }
+
+  if (error || !currentChild) {
+    return (
+      <Card title="회화 표현 학습하기" className="blur-sm">
+        <div className="mt-3 relative p-4 md:p-6 text-center text-gray-500">
+          데이터 없음
+        </div>
+      </Card>
+    );
+  }
 
   const handleLessonClick = () => {
-    // childId를 사용하여 동적 경로로 이동
-    navigate(`/chatbot/${childId}`);
+    if (!currentChild.id) {
+      // id가 없을 경우를 대비한 방어 로직
+      alert("유효한 자녀 정보가 없습니다.");
+      return;
+    }
+    navigate(`/chatbot/${currentChild.id}`);
   };
 
   return (
-    <Card title="회화 표현 학습하기" className={isBlurred ? "blur-sm" : ""}>
+    <Card title="회화 표현 학습하기" className="">
       <div className="mt-3 relative p-4 md:p-6">
         <p className="text-thirdary font-body1-m text-lg md:text-xl">
-          {isBlurred ? "데이터 없음" : conversation}
+          {currentChild.conversation}
         </p>
-
         <button
           type="button"
-          onClick={handleLessonClick} // onClick 핸들러 추가
+          onClick={handleLessonClick}
           className="mt-6 mx-auto block rounded-full px-5 md:px-6 py-2 md:py-2.5
                      font-body2-sb text-thirdary
                      bg-secondary hover:bg-secondary/90 active:bg-secondary/80

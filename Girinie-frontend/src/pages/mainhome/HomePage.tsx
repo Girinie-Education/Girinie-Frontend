@@ -54,18 +54,18 @@ const HomePage: React.FC = () => {
   const showButton = data.length > 1;
 
   return (
-    <div className="mt-20 min-h-screen bg-primary relative"> {/* relative 추가 */}
+    <div className="mt-20 min-h-screen bg-primary relative">
       <div className="mx-auto max-w-3xl lg:max-w-5xl px-4 md:px-6 py-6 md:py-8">
         {showButton && (
           <>
             <ArrowButton
               side="left"
-              visible={true} // 항상 활성화
+              visible={true}
               onClick={handlePrevChild}
             />
             <ArrowButton
               side="right"
-              visible={true} // 항상 활성화
+              visible={true}
               onClick={handleNextChild}
             />
           </>
@@ -79,11 +79,7 @@ const HomePage: React.FC = () => {
               </div>
 
               <DailyQuote quote={currentChild?.quote} isBlurred={isBlurred} />
-              <UpcomingLesson
-                conversation={currentChild?.conversation}
-                isBlurred={isBlurred}
-                childId={currentChild?.id || 0}
-              />
+              <UpcomingLesson />
 
               <div className="lg:hidden">
                 <StreakPanel days={currentChild?.streak} childName={currentChild?.name} isBlurred={isBlurred} />
