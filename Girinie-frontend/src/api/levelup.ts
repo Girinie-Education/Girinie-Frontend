@@ -42,6 +42,31 @@ export async function fetchChildUser(id: number): Promise<ChildUser> {
   return response.data;
 }
 
+/** 레벨업 로그를 카테고리별 진행률 바 데이터로 변환 */
+export function transformLevelUpLogsToProgressBars(logs: LevelUpLog[]): Array<{ name: string; level: number }> {
+  const categories = ["질서", "예절", "자존", "청결", "감정조절", "존중", "절약", "식습관"];
+  
+  if (!logs.length) {
+    return categories.map(name => ({ name, level: 0 }));
+  }
+
+  // 카테고리별 최신 레벨 찾기
+  const categoryLevels: Record<string, number> = {};
+  
+  logs.forEach(log => {
+    const categoryName = log.category_display || log.category;
+    if (!categoryLevels[categoryName] || log.level > categoryLevels[categoryName]) {
+      categoryLevels[categoryName] = log.level;
+    }
+  });
+
+  // 카테고리별 레벨 매핑
+  return categories.map(category => ({
+    name: category,
+    level: categoryLevels[category] || 0
+  }));
+}
+
 export function transformLogsToChartData(logs: LevelUpLog[]) {
   const categories = ["질서", "배려", "책임", "정직", "표현", "집중"];
   
