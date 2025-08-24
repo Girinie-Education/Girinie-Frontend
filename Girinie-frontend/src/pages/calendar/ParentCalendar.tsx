@@ -1,7 +1,7 @@
 // src/pages/CalendarPage/ParentCalendar.tsx
 import { useEffect, useMemo, useState } from "react";
 import Calendar from "@/components/calendar/Calendar";
-import Modal from "@/components/calendar/CalendarModal";
+import ProgressModal from "@/components/modal/ProgressModal";
 import StickerStamp from "@/components/calendar/StickerStamp";
 import { fetchMonthlyRewards, type RewardCalendar } from "@/api/parent";
 import { useNavigate, useParams } from "react-router-dom";
@@ -74,13 +74,21 @@ export default function ParentCalendarPage() {
     };
   }, [effectiveChildId]);
 
+  // 로컬 날짜를 YYYY-MM-DD 형식으로 변환 (시간대 문제 해결)
+  const formatLocalDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleDayClick = (date: Date) => {
     setSelectedDate(date);
     setModalOpen(true);
   };
 
   const renderStamp = (date: Date) => {
-    const key = date.toISOString().slice(0, 10);
+    const key = formatLocalDate(date);
     const items = stamps[key] || [];
     if (items.length === 0) return null;
     
@@ -115,21 +123,14 @@ export default function ParentCalendarPage() {
               </div>
             )}
             <Calendar mode="parent" onDayClick={handleDayClick} renderStamp={renderStamp} />
-            {modalOpen && (
-              <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} rate={0}>
-                <h2 className="mb-2 text-lg font-semibold">도장 목록</h2>
-                {selectedDate && (
-                  <ul className="list-disc pl-6">
-                    {(stamps[selectedDate.toISOString().slice(0, 10)] || []).map((s) => (
-                      <li key={s.id}>
-                        {s.date} · {s.sticker_label ?? `type ${s.sticker_type}`}{" "}
-                        {s.message ? `- ${s.message}` : ""}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </Modal>
-            )}
+            
+            {/* Progress Modal */}
+            <ProgressModal 
+              childId={effectiveChildId ? Number(effectiveChildId) : undefined}
+              isOpen={modalOpen}
+              onClose={() => setModalOpen(false)}
+              initialDate={selectedDate ? formatLocalDate(selectedDate) : undefined}
+            />
           </div>
         </main>
       </div>

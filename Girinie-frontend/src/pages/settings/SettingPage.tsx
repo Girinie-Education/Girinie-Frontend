@@ -6,14 +6,17 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { ChildUser } from "@/lib/childData";
 import { apiClient, ensureCsrfCookie } from "@/api/common";
 import { useNavigate } from "react-router-dom";
+import AddChildModal from "@/components/modal/AddChildModal";
+import ProfileSettings from "@/components/settings/ProfileSettings";
 
 const getCardsPerPage = (): number =>
   typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 2;
 
 export default function SettingPage() {
-  const { data: children = [], loading, error } = useChildData();
+  const { data: children = [], loading, error, refetch } = useChildData();
   const [page, setPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(getCardsPerPage());
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,50 +31,15 @@ export default function SettingPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, [children.length]);
 
-  const handleAddChild = async () => {
-    try {
-      const name = window.prompt("아이 이름을 입력하세요 (예: 민준)")?.trim() || "";
-      if (!name) {
-        alert("이름은 필수입니다.");
-        return;
-      }
-      const ageStr = window.prompt("아이 나이를 입력하세요 (숫자)")?.trim() || "";
-      const age = Number(ageStr);
-      if (!ageStr || Number.isNaN(age) || age < 0) {
-        alert("나이는 0 이상의 숫자여야 합니다.");
-        return;
-      }
-      const color = window.prompt("아이 대표 색상을 입력하세요 (예: yellow)")?.trim() || "";
-      if (!color) {
-        alert("색상은 필수입니다.");
-        return;
-      }
+  const handleAddChild = () => {
+    setIsAddModalOpen(true);
+  };
 
-      // 세션/CSRF 쿠키 보장
-      await ensureCsrfCookie().catch(() => {});
-
-      const body = { name, age, color };
-      const res = await apiClient.post("/child_users/", body);
-      console.log("[child] created:", res.data);
-      alert("자녀가 추가되었습니다.");
-      // 간단한 새로고침으로 목록 갱신 (useChildData에 refetch가 없는 경우)
+  const handleAddChildSuccess = () => {
+    if (refetch) {
+      refetch();
+    } else {
       window.location.reload();
-    } catch (err: any) {
-      const data = err?.response?.data;
-      console.error("[child] create failed:", data || err?.message || err);
-      const msg = data?.message || "자녀 추가 중 오류가 발생했습니다.";
-      const errs = data?.errors;
-      let detail = "";
-      if (errs && typeof errs === "object") {
-        detail = Object.entries(errs)
-          .map(([k, v]) => {
-            if (Array.isArray(v)) return `${k}: ${v.join(", ")}`;
-            if (v && typeof v === "object") return `${k}: ${JSON.stringify(v)}`;
-            return `${k}: ${String(v)}`;
-          })
-          .join("\n");
-      }
-      alert(detail ? `${msg}\n\n${detail}` : msg);
     }
   };
 
@@ -179,26 +147,39 @@ export default function SettingPage() {
             </div>
 
             {/* 계정 설정 */}
-            <div className="mt-10 flex flex-col items-start gap-2 text-gray-800">
+            <div className="mt-10 text-gray-800">
               <div className="mb-4 text-xl font-semibold">계정 설정</div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="block cursor-pointer text-left hover:underline"
-              >
-                로그아웃
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteAccount}
-                className="block cursor-pointer text-left text-red-500 hover:underline"
-              >
-                회원 탈퇴
-              </button>
+              
+              {/* 프로필 설정 */}
+              <ProfileSettings />
+              
+              {/* 로그아웃 및 탈퇴 */}
+              <div className="flex flex-col items-start gap-2">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="block cursor-pointer text-left hover:underline"
+                >
+                  로그아웃
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  className="block cursor-pointer text-left text-red-500 hover:underline"
+                >
+                  회원 탈퇴
+                </button>
+              </div>
             </div>
           </div>
         </main>
       </div>
+
+      <AddChildModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={handleAddChildSuccess}
+      />
     </div>
   );
 }

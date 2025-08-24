@@ -74,3 +74,46 @@ export async function createReward(
     throw payload;
   }
 }
+
+// ==== 회원 정보 관리 ====
+export interface ParentUser {
+  id: number;
+  username: string;
+  password: string;
+  email: string;
+}
+
+export interface UpdateUserPayload {
+  username?: string;
+  email?: string;
+}
+
+/** 현재 회원 정보 조회 (GET /parent_users/me/) */
+export async function fetchCurrentUser(): Promise<ParentUser> {
+  const url = "/parent_users/me/";
+  try {
+    console.log("[parentApi] GET", url);
+    const res = await apiClient.get(url);
+    console.log("[parentApi] GET ok", url, { status: res.status });
+    return res.data as ParentUser;
+  } catch (error: any) {
+    const payload = error?.response?.data ?? error?.message ?? error;
+    console.error("[parentApi] GET failed", url, payload);
+    throw payload;
+  }
+}
+
+/** 회원 정보 수정 (PUT /parent_users/me/) */
+export async function updateCurrentUser(body: UpdateUserPayload): Promise<ParentUser> {
+  const url = "/parent_users/me/";
+  try {
+    console.log("[parentApi] PUT", url, { body });
+    const res = await apiClient.put(url, body);
+    console.log("[parentApi] PUT ok", url, { status: res.status });
+    return res.data as ParentUser;
+  } catch (error: any) {
+    const payload = error?.response?.data ?? error?.message ?? error;
+    console.error("[parentApi] PUT failed", url, payload);
+    throw payload;
+  }
+}

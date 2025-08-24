@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ProfileCard from "./components/ProfileCard";
 import StickerBoard from "./components/StickerBoard";
 import DailyQuote from "./components/DailyQuote";
@@ -10,6 +11,13 @@ import { useHomeData } from "@/hooks/useHomeData";
 const HomePage: React.FC = () => {
   const { data, loading, error } = useHomeData();
   const [childIndex, setChildIndex] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !error && (!data || data.length === 0)) {
+      navigate('/settings');
+    }
+  }, [data, loading, error, navigate]);
 
   const handleNextChild = () => {
     if (data && data.length > 0) {
@@ -40,11 +48,7 @@ const HomePage: React.FC = () => {
   }
 
   if (!data || data.length === 0) {
-    return (
-      <div className="mt-20 min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">자녀 데이터가 없습니다.</div>
-      </div>
-    );
+    return null;
   }
 
   const currentChild = data[childIndex];
