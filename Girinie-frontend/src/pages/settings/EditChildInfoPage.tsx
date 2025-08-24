@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import GuardianSidebar from "@/components/common/GuardianSidebar";
 import { useChildData } from "@/hooks/useChildData";
 import { putChildUser } from "@/lib/childData";
@@ -12,6 +12,7 @@ import axios from "axios";
 export default function EditChildInfoPage() {
   const { childId } = useParams<{ childId: string }>();
   const { data: children = [], loading, error, refetch } = useChildData();
+  const navigate = useNavigate();
 
   const child = useMemo(() => {
     if (childId && children.length > 0) {
@@ -84,6 +85,7 @@ export default function EditChildInfoPage() {
       await putChildUser(child.id, updateData);
       alert("아이 정보가 성공적으로 변경되었습니다.");
       refetch();
+      navigate("/settings");
     } catch (error) {
       console.error("아이 정보 변경 실패:", error);
       let errorMessage = "아이 정보 변경 중 알 수 없는 오류가 발생했습니다.";

@@ -1,9 +1,9 @@
 // src/pages/home/HomePage.tsx
 
-import Logo from "@/assets/icons/image.svg?react";
-import IconChatbot from "@/assets/images/G1.svg?react";
-import IconCulture from "@/assets/images/G2.svg?react";
-import IconParent from "@/assets/images/G3.svg?react";
+import logoUrl from "@/assets/icons/image.svg";
+import iconChatbotUrl from "@/assets/images/G1.svg";
+import iconCultureUrl from "@/assets/images/G2.svg";
+import iconParentUrl from "@/assets/images/G3.svg";
 
 export default function HomePage() {
   return (
@@ -11,7 +11,7 @@ export default function HomePage() {
       <main className="flex flex-col items-center gap-0 text-left">
         <section className="m-0 grid w-full grid-cols-1 gap-8 border-none bg-[#FEF1B0] px-4 py-52 md:grid-cols-2 md:px-8 lg:px-16">
           <div className="col-span-1 flex items-center justify-center">
-            <Logo style={{ width: "1000px", height: "auto" }} />
+            <img src={logoUrl} alt="Logo" style={{ width: "1000px", height: "auto" }} />
           </div>
           <div className="col-span-1 mt-0 space-y-4 px-4">
             <h2 className="pb-8 pt-8 text-4xl font-bold text-[#333]">
@@ -32,14 +32,14 @@ export default function HomePage() {
           <div className="grid w-full grid-cols-1 gap-8 text-center md:grid-cols-3">
             {/* Card 1 */}
             <div className="flex h-[280px] flex-col justify-center rounded-lg bg-white p-8 shadow-md transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg">
-              <IconChatbot className="mx-auto mb-4 h-24 w-24" />
+              <img src={iconChatbotUrl} alt="AI 챗봇" className="mx-auto mb-4 h-24 w-24" />
               <h3 className="mb-2 font-bold text-[#333]">AI 챗봇 기반</h3>
               <p className="text-sm text-gray-600">아이 눈높이에 맞춰 대화형으로 배우는 학습</p>
             </div>
 
             {/* Card 2 */}
             <div className="flex h-[280px] flex-col justify-center rounded-lg bg-white p-8 shadow-md transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg">
-              <IconCulture className="mx-auto mb-4 h-24 w-24" />
+              <img src={iconCultureUrl} alt="문화 교육" className="mx-auto mb-4 h-24 w-24" />
               <h3 className="mb-2 font-bold text-[#333]">문화·생활 중심 교육</h3>
               <p className="text-sm text-gray-600">교과과정뿐만 아니라 예절, 문화, 생활 기초 등</p>
               <p className="text-sm text-gray-600"> 실생활 밀착 교육</p>
@@ -47,7 +47,7 @@ export default function HomePage() {
 
             {/* Card 3 */}
             <div className="flex h-[280px] flex-col justify-center rounded-lg bg-white p-8 shadow-md transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg">
-              <IconParent className="mx-auto mb-4 h-24 w-24" />
+              <img src={iconParentUrl} alt="부모 참여" className="mx-auto mb-4 h-24 w-24" />
               <h3 className="mb-2 font-bold text-[#333]">부모도 함께</h3>
               <p className="text-sm text-gray-600">
                 보호자가 직접 검사하고 관리할 수 있도록 보호자 탭 형성

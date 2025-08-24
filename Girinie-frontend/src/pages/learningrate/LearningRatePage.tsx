@@ -6,12 +6,15 @@ import LearningRateCharts from "@/components/common/LearningRateCharts";
 import CategoryProgressBars from "@/components/common/CategoryProgressBars";
 import {
   fetchAllLevelUpLogs,
+  fetchChildLevelUpLogs,
   transformLogsToChartData,
   transformChildUserToChartData,
+  transformLevelUpLogsToProgressBars,
   fetchChildUser,
   LevelUpLog,
   ChildUser,
 } from "@/api/levelup";
+import { listAllSessions } from "@/api/chat";
 
 const CATEGORY_LABELS: Record<
   keyof Pick<
@@ -35,6 +38,18 @@ const CATEGORY_LABELS: Record<
   eating_level: "식습관",
   calm_level: "감정조절",
   kindness_level: "존중",
+};
+
+// 영어 카테고리명을 한글로 변환하는 매핑
+const CATEGORY_NAME_MAP: Record<string, string> = {
+  order: "질서",
+  manners: "예절",
+  selfcare: "자존", 
+  clean: "청결",
+  saving: "절약",
+  eating: "식습관",
+  calm: "감정조절",
+  kindness: "존중"
 };
 
 export default function LearningRatePage() {
@@ -86,17 +101,28 @@ export default function LearningRatePage() {
     setSelectedWeekOffset((prev) => prev + 1);
   };
 
-  // Logs for timeline & "최근 학습"
+  // 아이별 레벨업 로그 조회
   const {
     data: logs = [],
     isLoading: isLogsLoading,
     error: logsError,
   } = useQuery({
     queryKey: ["levelupLogs", childId],
-    queryFn: fetchAllLevelUpLogs,
+    queryFn: () => fetchChildLevelUpLogs(childId),
+    enabled: Number.isFinite(childId),
   });
 
-  // Child detail for current levels (radar & bars)
+  // 채팅 세션 데이터 조회 (주간 학습용)
+  const {
+    data: chatSessions = [],
+    isLoading: isChatLoading,
+  } = useQuery({
+    queryKey: ["chatSessions", childId],
+    queryFn: () => listAllSessions(childId),
+    enabled: Number.isFinite(childId),
+  });
+
+  // Child detail for current levels (radar & bars)  
   const {
     data: child,
     isLoading: isChildLoading,
@@ -110,9 +136,60 @@ export default function LearningRatePage() {
   const chartData = useMemo(() => {
     return child ? transformChildUserToChartData(child) : transformLogsToChartData(logs);
   }, [child, logs]);
-  const latestLog = logs[0];
+  
+  // 진행률 바 데이터는 레벨업 로그 기반으로 생성
+  const progressBarData = useMemo(() => {
+    return transformLevelUpLogsToProgressBars(logs);
+  }, [logs]);
+  
+  // 주간 학습 데이터 계산
+  const weeklyLearningData = useMemo(() => {
+    console.log('전체 chatSessions:', chatSessions);
+    
+    return weekDays.map(day => {
+      const dayStr = day.toISOString().split('T')[0];
+      console.log(`${dayStr} (${day.getDate()}일) 확인 중...`);
+      
+      const daySessions = chatSessions.filter(session => {
+        // 세션의 첫 번째 메시지의 created_at을 세션 날짜로 사용
+        const firstMessage = session.messages?.[0];
+        if (!firstMessage?.created_at) return false;
+        
+        const sessionDate = new Date(firstMessage.created_at).toISOString().split('T')[0];
+        const match = sessionDate === dayStr;
+        
+        console.log(`  세션 ID ${session.id}: 첫 메시지 created_at: ${firstMessage.created_at} → 파싱된 날짜: ${sessionDate}, 매치: ${match}`);
+        
+        return match;
+      });
+      
+      console.log(`${dayStr} (${day.getDate()}일) 세션 개수: ${daySessions.length}`);
+      
+      return {
+        date: day,
+        sessionCount: daySessions.length,
+        categories: [...new Set(daySessions.map(s => s.category))]
+      };
+    });
+  }, [weekDays, chatSessions]);
 
-  if (isLogsLoading || isChildLoading) {
+  // 최근 학습 데이터 계산 (가장 최근 세션)
+  const latestSession = useMemo(() => {
+    if (!chatSessions.length) return null;
+    
+    // 세션을 첫 번째 메시지 생성일 기준으로 정렬하여 가장 최근 세션 찾기
+    const sortedSessions = [...chatSessions]
+      .filter(session => session.messages?.[0]?.created_at) // 첫 메시지가 있는 세션만
+      .sort((a, b) => {
+        const aTime = new Date(a.messages[0].created_at).getTime();
+        const bTime = new Date(b.messages[0].created_at).getTime();
+        return bTime - aTime;
+      });
+    
+    return sortedSessions[0];
+  }, [chatSessions]);
+
+  if (isLogsLoading || isChildLoading || isChatLoading) {
     return (
       <div className="min-h-screen bg-[#FFFFFF]">
         <ChildSidebar />
@@ -147,18 +224,13 @@ export default function LearningRatePage() {
               <div className="rounded-xl border bg-white shadow-sm">
                 <div className="rounded-t-xl bg-[#F9DF63] px-4 py-3 font-semibold">최근 학습</div>
                 <div className="px-4 py-4">
-                  {latestLog ? (
-                    <div className="space-y-1">
-                      <div className="font-medium text-gray-900">
-                        {latestLog.category_display} 레벨업!
+                  {latestSession ? (
+                    <div className="text-left">
+                      <div className="font-normal text-gray-900 text-base">
+                        {CATEGORY_NAME_MAP[latestSession.category] || latestSession.category} 학습 {latestSession.is_active ? '진행중' : '완료'} Lv.{latestSession.current_level}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="text-gray-800">
-                          {latestLog.category_display} Lv.{latestLog.level}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(latestLog.created_at).toLocaleDateString()}
-                        </div>
+                      <div className="text-sm text-gray-500 mt-2">
+                        {latestSession.created_at ? new Date(latestSession.created_at).toLocaleDateString() : ''}
                       </div>
                     </div>
                   ) : (
@@ -190,23 +262,29 @@ export default function LearningRatePage() {
                   </div>
                   <div className="flex flex-1 items-end items-center justify-between gap-2 pb-4">
                     {["월", "화", "수", "목", "금", "토", "일"].map((d, i) => {
-                      const dayDate = weekDays[i];
+                      const dayData = weeklyLearningData[i];
+                      const dayDate = dayData.date;
+                      const sessionCount = dayData.sessionCount;
                       const isToday = dayDate.toDateString() === today.toDateString();
                       const isCurrentMonth = dayDate.getMonth() === today.getMonth();
+                      const hasLearning = sessionCount > 0;
 
                       return (
                         <div key={d} className="flex flex-col items-center text-xs text-gray-500">
                           <span className="mb-1">{d}</span>
                           <div className="mb-1 text-xs text-gray-400">{dayDate.getDate()}</div>
                           <div
-                            className={`h-8 w-8 rounded-full border ${
-                              isToday
-                                ? "border-[#F9DF63] bg-[#F9DF63]"
+                            className={`h-8 w-8 rounded-full border flex items-center justify-center ${
+                              hasLearning
+                                ? "border-[#F9DF63] bg-[#F9DF63] text-white font-bold"
                                 : isCurrentMonth
                                   ? "border-gray-300 bg-gray-100"
                                   : "border-gray-200 bg-gray-50"
                             }`}
-                          ></div>
+                            title={hasLearning ? `채팅한 날: ${dayData.categories.join(', ')}` : '학습 없음'}
+                          >
+                            {hasLearning ? '' : ''}
+                          </div>
                         </div>
                       );
                     })}
@@ -216,7 +294,7 @@ export default function LearningRatePage() {
             </div>
 
             {/* 우측 레이더 차트 (60%) */}
-            <div className="rounded-xl border bg-white p-2 shadow-sm xl:col-span-3">
+            <div className="rounded-xl border bg-white p-2 shadow-sm xl:col-span-3 flex items-center justify-center">
               <LearningRateCharts data={chartData} className="mb-2" />
             </div>
           </div>
