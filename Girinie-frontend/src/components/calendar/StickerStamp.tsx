@@ -7,11 +7,11 @@ import yellowStamp from "@/assets/icons/stamp/yellow_stamp.svg";
 
 // API 스티커 타입별 매핑
 const STICKER_STAMPS: Record<number, string> = {
-  1: blueStamp, // "조금 더 노력해봐요" - 빨간색
+  1: blueStamp, // "조금 더 노력해봐요" - 파란색
   2: yellowStamp, // "잘하고 있어요" - 노란색
-  3: pinkStamp, // "참 잘했어요" - 파란색
-  4: pinkStamp, // "아주 훌륭해요" - 초록색
-  5: greenStamp, // "정말 최고예요" - 분홍색
+  3: pinkStamp, // "참 잘했어요" - 분홍색
+  4: redStamp, // "아주 훌륭해요" - 빨간색
+  5: greenStamp, // "정말 최고예요" - 초록색
 };
 
 type StickerStampProps = {

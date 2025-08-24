@@ -1,17 +1,26 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logoUrl from "@/assets/icons/TextLogo.svg";
 import { useAuthStore } from "@/stores/authStore";
 import { useChildData } from "@/hooks/useChildData";
+import { useEffect } from "react";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const isLoggedIn = useAuthStore(state => state.isLoggedIn);
   const { childId: urlChildId } = useParams(); // ★★★ URL에서 childId 가져오기 ★★★
-  const { data: children } = useChildData();
+  const { data: children, refetch } = useChildData();
 
   // ★★★ 현재 자녀 ID를 결정합니다. URL에 있으면 그걸 사용하고, 없으면 첫 번째 자녀의 ID를 사용합니다. ★★★
   const currentChildId = urlChildId || (children && children.length > 0 ? children[0].id.toString() : null);
+
+  // 설정 페이지에서 다른 페이지로 이동할 때 자녀 데이터 새로고침
+  useEffect(() => {
+    if (isLoggedIn && location.pathname !== '/settings') {
+      refetch();
+    }
+  }, [location.pathname, isLoggedIn, refetch]);
 
   const handleLogoClick = () => {
     navigate(isLoggedIn ? "/home" : "/");
