@@ -3,15 +3,12 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-// ESM에서 __dirname 대체
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [svgr(), react(), tsconfigPaths()],
   resolve: {
@@ -24,7 +21,7 @@ export default defineConfig({
     host: true,
     proxy: {
       "/api/v1": {
-        target: "https://f68416e83316.ngrok-free.app",
+        target: "",
         changeOrigin: true,
         secure: true,
         configure: (proxy) => {
